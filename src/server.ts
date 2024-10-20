@@ -2,7 +2,7 @@ import express from "express";
 import {Request, Response, Router} from "express";
 import { AccountsHandler } from "./accounts/accounts";
 
-const port = 3333;
+const port = 3004;
 const server = express();
 const routes = Router();
 
@@ -16,6 +16,7 @@ routes.get('/', (req: Request, res: Response)=>{
 // vamos organizar as rotas em outro local 
 // login...
 routes.post('/login',AccountsHandler.loginHandler);
+routes.post('/signUp',AccountsHandler.signUpHandler);
 
 server.use(routes);
 
