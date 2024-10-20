@@ -2,7 +2,7 @@ import express from "express";
 import {Request, Response, Router} from "express";
 import { AccountsHandler } from "./accounts/accounts";
 
-const port = 3000; 
+const port = 3333;
 const server = express();
 const routes = Router();
 
