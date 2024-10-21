@@ -19,7 +19,7 @@ export namespace AccountsHandler {
     };
 
     // Função para validar credenciais
-    async function validateCredentials(email: string, password: string): Promise<boolean> {
+    async function validateCredentials(email: string, password: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         // Conectar-se ao Oracle
@@ -31,26 +31,24 @@ export namespace AccountsHandler {
 
         // Executar a consulta para verificar se o e-mail e a senha existem
         const result = await connection.execute(
-            'SELECT COUNT(*) AS COUNT FROM ACCOUNTS WHERE email = :email AND password = :password',
+            'SELECT * FROM ACCOUNTS WHERE email = :email AND password = :password',
             [email, password]
         );
 
         await connection.close();
 
-        // Verificar se result.rows existe e se o COUNT é maior que 0
-        const rows = result.rows as { COUNT: number }[];
-        return (rows && rows.length > 0 && rows[0].COUNT > 0) || false;
+        // Retorna verdadeiro se existirem registros
+        return result.rows && result.rows.length > 0; // Retorna true se houver pelo menos uma linha
     }
 
     async function login(email: string, password: string) {
-        const isValid = await validateCredentials(email, password);
-        return isValid;
+        return await validateCredentials(email, password); // Retorna diretamente o resultado da validação
     }
 
     export const loginHandler: RequestHandler = 
         async (req: Request, res: Response) => {
-            const pEmail = req.get('email'); // Mudado para req.body
-            const pPassword = req.get('password'); // Mudado para req.body
+            const pEmail = req.get('email'); 
+            const pPassword = req.get('password'); 
 
             if (pEmail && pPassword) {
                 // Chamar a função de login. 
