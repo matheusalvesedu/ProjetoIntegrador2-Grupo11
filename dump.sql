@@ -13,7 +13,7 @@ INSERT INTO ACCOUNTS (ID, COMPLETE_NAME, EMAIL, PASSWORD
 ) VALUES (
     SEQ_ACCOUNTS.NEXTVAL,
     'Felipe Pretoni',
-    'felipe@felipe.com',
+    'felipe@felipe.',
     '123felipe'
 )
 
