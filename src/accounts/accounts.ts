@@ -16,7 +16,9 @@ export namespace AccountsHandler {
         completeName: string;
         email: string;
         password: string | undefined;
-    };
+            };
+    
+    
 
     // Função para validar credenciais
     async function validateCredentials(email: string, password: string) {
@@ -61,5 +63,58 @@ export namespace AccountsHandler {
             } else {
                 res.status(400).send('Requisição inválida - Parâmetros faltando.');
             }
+        } 
+
+    async function signUp(name: string, email: string, password: string) {
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        const connection = await OracleDB.getConnection({
+            user: process.env.ORACLE_USER,
+            password: process.env.ORACLE_PASSWORD,
+            connectString: process.env.ORACLE_CONN_STR
+        });
+
+        await connection.execute(
+            'INSERT INTO ACCOUNTS (ID, completeName, email, password) VALUES (SEQ_ACCOUNTS.NEXTVAL, :name, :email, :password)',
+            [name, email, password]
+        );
+        await connection.execute('commit');
+        await connection.close();
+    }
+
+    // Handler para o cadastro de novos usuários
+    export const signUpHandler: RequestHandler = async (req: Request, res: Response) => {
+        const pName = req.get('name');  // Mudado para req.body para capturar os dados corretamente
+        const pEmail = req.get('email');
+        const pPassword = req.get('password');
+
+        if (pName && pEmail && pPassword) {
+            // Conexão com o banco de dados para verificar se o e-mail já existe
+            const connection = await OracleDB.getConnection({
+                user: process.env.ORACLE_USER,
+                password: process.env.ORACLE_PASSWORD,
+                connectString: process.env.ORACLE_CONN_STR
+            });
+
+            const result = await connection.execute(
+                'SELECT * FROM ACCOUNTS WHERE email = :email',
+                [pEmail]
+            );
+
+            if (result.rows && result.rows.length > 0) {
+                // Se o usuário já estiver cadastrado
+                res.status(400).send('Usuário já cadastrado.');
+            } else {
+                // Se o usuário não estiver cadastrado, faz o cadastro
+                await signUp(pName, pEmail, pPassword);
+                res.status(200).send('Usuário cadastrado com sucesso.');
+            }
+
+            await connection.close();
+
+        } else {
+            // Verifica se algum parâmetro está faltando
+            res.status(400).send('Requisição inválida - Parâmetros faltando.');
         }
-}
+    };
+    }

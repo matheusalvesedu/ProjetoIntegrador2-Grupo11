@@ -2,7 +2,7 @@ import express from "express";
 import { Request, Response, Router } from "express";
 import { AccountsHandler } from "./accounts/accounts";
 
-const port = 3000; 
+const port = 6669; 
 const server = express();
 const routes = Router();
 
@@ -16,6 +16,7 @@ routes.get('/', (req: Request, res: Response) => {
 
 // Rota para login
 routes.post('/login', AccountsHandler.loginHandler);
+routes.put('/signup', AccountsHandler.signUpHandler);
 
 server.use(routes);
 
