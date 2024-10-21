@@ -16,9 +16,7 @@ export namespace AccountsHandler {
         completeName: string;
         email: string;
         password: string | undefined;
-            };
-    
-    
+    };
 
     // Função para validar credenciais
     async function validateCredentials(email: string, password: string) {
@@ -63,7 +61,8 @@ export namespace AccountsHandler {
             } else {
                 res.status(400).send('Requisição inválida - Parâmetros faltando.');
             }
-        } 
+        }
+
 
     async function signUp(name: string, email: string, password: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
