@@ -3,19 +3,17 @@ import OracleDB from "oracledb";
 import dotenv from 'dotenv'; 
 dotenv.config();
 
-/*
-    Namespace que contém tudo sobre "contas de usuários"
-*/
+
+    // Namespace que contém tudo sobre "contas de usuários"
 export namespace AccountsHandler {
     
-    /**
-     * Tipo UserAccount
-     */
+    // Tipo UserAccount
     export type UserAccount = {
         id: number | undefined;
-        completeName: string;
+        complete_name: string;
         email: string;
         password: string | undefined;
+        birthday_date: string | undefined;
     };
 
     // Função para validar credenciais
@@ -64,7 +62,7 @@ export namespace AccountsHandler {
         }
 
 
-    async function signUp(name: string, email: string, password: string) {
+    async function signUp(name: string, email: string, password: string, birthday_date: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         const connection = await OracleDB.getConnection({
@@ -74,8 +72,8 @@ export namespace AccountsHandler {
         });
 
         await connection.execute(
-            'INSERT INTO ACCOUNTS (ID, completeName, email, password) VALUES (SEQ_ACCOUNTS.NEXTVAL, :name, :email, :password)',
-            [name, email, password]
+            'INSERT INTO ACCOUNTS (ID, complete_name, email, password, birthday_date) VALUES (SEQ_ACCOUNTS.NEXTVAL, :complete_name, :email, :password, :birthday_date)',
+            [name, email, password, birthday_date]
         );
         await connection.execute('commit');
         await connection.close();
@@ -83,11 +81,12 @@ export namespace AccountsHandler {
 
     // Handler para o cadastro de novos usuários
     export const signUpHandler: RequestHandler = async (req: Request, res: Response) => {
-        const pName = req.get('name');  // Mudado para req.body para capturar os dados corretamente
+        const pName = req.get('complete_name'); 
         const pEmail = req.get('email');
         const pPassword = req.get('password');
+        const pBirthday_date = req.get('birthday_date');
 
-        if (pName && pEmail && pPassword) {
+        if (pName && pEmail && pPassword && pBirthday_date) {
             // Conexão com o banco de dados para verificar se o e-mail já existe
             const connection = await OracleDB.getConnection({
                 user: process.env.ORACLE_USER,
@@ -105,7 +104,7 @@ export namespace AccountsHandler {
                 res.status(400).send('Usuário já cadastrado.');
             } else {
                 // Se o usuário não estiver cadastrado, faz o cadastro
-                await signUp(pName, pEmail, pPassword);
+                await signUp(pName, pEmail, pPassword, pBirthday_date);
                 res.status(200).send('Usuário cadastrado com sucesso.');
             }
 
