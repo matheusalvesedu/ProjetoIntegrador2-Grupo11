@@ -1,4 +1,5 @@
 DROP TABLE ACCOUNTS;
+DROP SEQUENCE SEQ_ACCOUNTS;
 
 CREATE TABLE ACCOUNTS (
     id INT PRIMARY KEY,       -- Identificador único do usuário
@@ -7,6 +8,7 @@ CREATE TABLE ACCOUNTS (
     password VARCHAR(255) NOT NULL, -- Senha do usuário
     birthday_date VARCHAR(10) NOT NULL -- Data de anivesário
 );
+
 
 CREATE SEQUENCE SEQ_ACCOUNTS START WITH 1 INCREMENT BY 1;
 

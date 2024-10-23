@@ -94,6 +94,29 @@ export namespace AccountsHandler {
                 connectString: process.env.ORACLE_CONN_STR
             });
 
+            // Verifica se a data de nascimento tem o formato correto
+            const formato = /^\d{2}\/\d{2}\/\d{4}$/;
+            if (!formato.test(pBirthday_date)) {
+                res.status(400).send('Formato da data de nascimento inválido. O formato correto é dd/mm/yyyy.');
+                await connection.close();
+                return;
+            }
+
+            // Converte a data de nascimento para o formato Date
+            const [day, month, year] = pBirthday_date.split('/').map(Number);
+            const birthDate = new Date(year, month - 1, day);
+
+            // Verifica se o usuário tem pelo menos 18 anos
+            const today = new Date();
+            const age = today.getFullYear() - birthDate.getFullYear();
+            const monthDifference = today.getMonth() - birthDate.getMonth();
+            const dayDifference = today.getDate() - birthDate.getDate();
+
+            if (age < 18 || (age === 18 && (monthDifference < 0 || (monthDifference === 0 && dayDifference < 0)))) {
+                res.status(400).send('Usuário deve ter pelo menos 18 anos.');
+                await connection.close();
+                return;
+            }
             const result = await connection.execute(
                 'SELECT * FROM ACCOUNTS WHERE email = :email',
                 [pEmail]
