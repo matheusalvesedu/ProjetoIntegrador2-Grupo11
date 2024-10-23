@@ -7,20 +7,22 @@ CREATE TABLE ACCOUNTS (
     email VARCHAR(100) UNIQUE NOT NULL, -- Email, deve ser único
     password VARCHAR(255) NOT NULL, -- Senha do usuário
     birthday_date VARCHAR(10) NOT NULL, -- Data de anivesário
-    user_type VARCHAR(9) -- Tipo de usuário
+    user_type VARCHAR(9), -- Tipo de usuário
+    balance DECIMAL
 );
 
 
 CREATE SEQUENCE SEQ_ACCOUNTS START WITH 1 INCREMENT BY 1;
 
-INSERT INTO ACCOUNTS (ID, COMPLETE_NAME, EMAIL, PASSWORD, BIRTHDAY_DATE, USER_TYPE
+INSERT INTO ACCOUNTS (ID, COMPLETE_NAME, EMAIL, PASSWORD, BIRTHDAY_DATE, USER_TYPE, BALANCE
 ) VALUES (
     SEQ_ACCOUNTS.NEXTVAL,
     'Felipe Corso Pretoni',
     'felipepretoni@gmail.com',
     '123felipe',
     '05/01/2006',
-    'ADMIN'
+    'ADMIN',
+    0
 );
 
 commit;
