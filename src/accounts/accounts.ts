@@ -14,6 +14,7 @@ export namespace AccountsHandler {
         email: string;
         password: string | undefined;
         birthday_date: string | undefined;
+        user_type: string | undefined;
     };
 
     // Função para validar credenciais
@@ -72,8 +73,8 @@ export namespace AccountsHandler {
         });
 
         await connection.execute(
-            'INSERT INTO ACCOUNTS (ID, complete_name, email, password, birthday_date) VALUES (SEQ_ACCOUNTS.NEXTVAL, :complete_name, :email, :password, :birthday_date)',
-            [name, email, password, birthday_date]
+            'INSERT INTO ACCOUNTS (ID, complete_name, email, password, birthday_date, user_type) VALUES (SEQ_ACCOUNTS.NEXTVAL, :complete_name, :email, :password, :birthday_date, :user_type)',
+            [name, email, password, birthday_date, 'PLAYER']
         );
         await connection.execute('commit');
         await connection.close();

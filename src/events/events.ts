@@ -7,7 +7,7 @@ export namespace EventsHandler {
     
     export type Event = {
         eventId: number;
-        eventName: string;
+        eventTitle: string;
         eventDescripction: string;
         eventDate: string;
         eventStatus: string;
