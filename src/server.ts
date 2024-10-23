@@ -1,6 +1,8 @@
 import express from "express";
 import { Request, Response, Router } from "express";
 import { AccountsHandler } from "./accounts/accounts";
+import { FinancialManager } from "./financial/financial";
+import { EventsHandler } from "./events/events";
 
 const port = 3000; 
 const server = express();
@@ -17,6 +19,9 @@ routes.get('/', (req: Request, res: Response) => {
 // Rota para login
 routes.post('/login', AccountsHandler.loginHandler);
 routes.put('/signup', AccountsHandler.signUpHandler);
+routes.get('/getWallet', FinancialManager.getWalletHandler);
+routes.put('/addEvent', EventsHandler.addNewEventsHandler);
+routes.post('deleteEvent', EventsHandler.deleteEventHandler);
 
 server.use(routes);
 

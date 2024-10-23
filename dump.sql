@@ -13,6 +13,7 @@ CREATE TABLE ACCOUNTS (
 
 
 CREATE SEQUENCE SEQ_ACCOUNTS START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE SEQ_EVENTS START WITH 1 INCREMENT BY 1;
 
 INSERT INTO ACCOUNTS (ID, COMPLETE_NAME, EMAIL, PASSWORD, BIRTHDAY_DATE, USER_TYPE, BALANCE
 ) VALUES (
@@ -27,10 +28,37 @@ INSERT INTO ACCOUNTS (ID, COMPLETE_NAME, EMAIL, PASSWORD, BIRTHDAY_DATE, USER_TY
 
 commit;
 
+DROP TABLE EVENTS;
+DROP SEQUENCE SEQ_EVENTS;
+
 CREATE TABLE EVENTS(
-    id_events INT PRIMARY KEY,
-    titulo VARCHAR2(50),
-    descricao VARCHAR2(150),
-    data_inicio VARCHAR2(10),
-    data_fim VARCHAR2(10)
+    event_id INT PRIMARY KEY,
+    event_title VARCHAR(50),
+    event_description VARCHAR(150),
+    eventStartDate VARCHAR(10),
+    eventFinalDate VARCHAR(10),
+    event_status VARCHAR(20),
+    FK_ACCOUNT_ID INT,
+    FOREIGN KEY (FK_ACCOUNT_ID) REFERENCES ACCOUNTS(ID)
 );
+
+CREATE SEQUENCE SEQ_EVENTS START WITH 1 INCREMENT BY 1;
+
+INSERT INTO EVENTS(
+    event_id,
+    event_title,
+    event_description,
+    eventStartDate,
+    eventFinalDate,
+    event_status,
+    FK_ACCOUNT_ID
+) VALUES (
+    SEQ_EVENTS.NEXTVAL,
+    'Evento de Teste',
+    'Evento de teste para a aplicação',
+    '01/01/2021',
+    '01/01/2021',
+    'Pendente',
+    '1'
+)
+

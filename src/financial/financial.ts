@@ -30,7 +30,7 @@ export namespace FinancialManager {
     }
 
     // Função para obter o saldo de uma carteira
-    export async function getWallet(ownerEmail: string): Promise<number> {
+     async function getWallet(ownerEmail: string): Promise<number> {
 
         let balance: number = 0; 
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
@@ -52,8 +52,8 @@ export namespace FinancialManager {
         if (result.rows && result.rows.length > 0) {
             const row = result.rows[0] as { balance: number };
             balance = row.balance;
-        }
-
+        } 
+        
         return balance;
     }
 
@@ -61,7 +61,7 @@ export namespace FinancialManager {
         const pEmail = req.get('email');
 
         if(pEmail){ 
-            const balance = getWallet(pEmail);
+            const balance = await getWallet(pEmail);
             if(balance){
                 res.statusCode = 200;
                 res.send(`Saldo da carteira: ${balance}`);
