@@ -1,6 +1,7 @@
 import { Request, RequestHandler, Response } from "express";
 import OracleDB from "oracledb";
 import dotenv from 'dotenv'; 
+import { parse } from "path";
 dotenv.config();
 
 export namespace EventsHandler {
@@ -14,7 +15,6 @@ export namespace EventsHandler {
         eventStatus: string;
     };
 
-    // Função para adicionar novos eventos sem usar try-catch, apenas if/else
     async function addNewEvent(eventTitle: string, eventDescription: string, eventStart: string, eventFinal: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
@@ -78,15 +78,15 @@ export namespace EventsHandler {
             [eventId]
         );
 
-        await connection.execute('commit');
+        await connection.commit();
         await connection.close();
     }
 
     export const deleteEventHandler: RequestHandler = async (req: Request, res: Response) => {
         const eventId = req.get('event_id');
-        res.send(eventId);
         if (eventId) {
-            await deleteEvent(Number(eventId));
+            const id = parseFloat(eventId);
+            await deleteEvent(id);
             res.status(200).send('Evento Excluído Com Sucesso.');
         } else {
             res.status(400).send('Parâmetros Faltando.');

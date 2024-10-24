@@ -21,7 +21,7 @@ routes.post('/login', AccountsHandler.loginHandler);
 routes.put('/signup', AccountsHandler.signUpHandler);
 routes.get('/getWallet', FinancialManager.getWalletHandler);
 routes.put('/addEvent', EventsHandler.addNewEventsHandler);
-routes.post('deleteEvent', EventsHandler.deleteEventHandler);
+routes.post('/deleteEvent', EventsHandler.deleteEventHandler);
 
 server.use(routes);
 

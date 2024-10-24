@@ -30,9 +30,8 @@ export namespace FinancialManager {
     }
 
     // Função para obter o saldo de uma carteira
-     async function getWallet(ownerEmail: string): Promise<number> {
+     async function getWallet(ownerEmail: string) {
 
-        let balance: number = 0; 
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         let connection = await OracleDB.getConnection({
@@ -50,11 +49,13 @@ export namespace FinancialManager {
         await connection.close();
 
         if (result.rows && result.rows.length > 0) {
-            const row = result.rows[0] as { balance: number };
-            balance = row.balance;
+            console.log(result.rows);
+            return true;
         } 
+        else{
+            return false;
+        }
         
-        return balance;
     }
 
     export const getWalletHandler: RequestHandler = async (req: Request, res: Response) => {
@@ -64,7 +65,7 @@ export namespace FinancialManager {
             const balance = await getWallet(pEmail);
             if(balance){
                 res.statusCode = 200;
-                res.send(`Saldo da carteira: ${balance}`);
+                res.send(`Saldo da carteira encontrado`);
             }else{
                 res.statusCode = 400;
                 res.send(`Carteira não encontrada para o email: ${pEmail}`);
