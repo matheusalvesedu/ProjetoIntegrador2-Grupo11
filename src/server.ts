@@ -22,6 +22,8 @@ routes.put('/signup', AccountsHandler.signUpHandler);
 routes.get('/getWallet', FinancialManager.getWalletHandler);
 routes.put('/addEvent', EventsHandler.addNewEventsHandler);
 routes.post('/deleteEvent', EventsHandler.deleteEventHandler);
+routes.post('/addFunds', FinancialManager.addFundsHandler);
+routes.post('/withdrawFunds', FinancialManager.withdrawFundsHandler);
 
 server.use(routes);
 
