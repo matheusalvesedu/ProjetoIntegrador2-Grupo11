@@ -1,7 +1,7 @@
 import { Request, RequestHandler, Response } from "express";
 import OracleDB from "oracledb";
 import dotenv from 'dotenv'; 
-import { parse } from "path";
+
 dotenv.config();
 
 export namespace EventsHandler {
@@ -92,4 +92,39 @@ export namespace EventsHandler {
             res.status(400).send('Parâmetros Faltando.');
         }
     }
+
+    async function evaluateEvent(eventId: number, event_status: string, desc: string) {
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        let connection = await OracleDB.getConnection({
+            user: process.env.ORACLE_USER,
+            password: process.env.ORACLE_PASSWORD,
+            connectString: process.env.ORACLE_CONN_STR
+        });
+
+        await connection.execute(
+            'UPDATE EVENTS SET event_status = :event_status WHERE event_id = :eventId',
+            [event_status, eventId],
+            {autoCommit: true}
+        );
+
+        
+        await connection.close();    
+    }
+
+    export const evaluateEventHandler: RequestHandler = async (req: Request, res: Response) => {
+        const eventId = req.get('event_id');
+        const eventStatus = req.get('event_status');
+        const textMessage = req.get('message');
+
+        if (eventId && eventStatus && textMessage) {
+            const id = parseInt(eventId);
+            await evaluateEvent(id, eventStatus, textMessage);
+            res.status(200).send(`Evento ${eventStatus}, ${textMessage}`);
+        } else {
+            res.status(400).send('Parâmetros Faltando.');
+        }
+    }
 }
+
+
