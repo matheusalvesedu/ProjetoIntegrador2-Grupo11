@@ -126,5 +126,7 @@ export namespace EventsHandler {
         }
     }
 }
+// searchEvent (Serviço que permite fazer busca de eventos por palavras-chave) para ser
+// usado justamente na homepage do site.)
 
 

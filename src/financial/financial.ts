@@ -30,11 +30,10 @@ export namespace FinancialManager {
     }
 
     // Função para obter o saldo de uma carteira
-    async function getWallet(ownerEmail: string) {
-
+    async function getWallet(ownerEmail: string): Promise<number | undefined> {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
-        let connection = await OracleDB.getConnection({
+        const connection = await OracleDB.getConnection({
             user: process.env.ORACLE_USER,
             password: process.env.ORACLE_PASSWORD,
             connectString: process.env.ORACLE_CONN_STR
@@ -45,27 +44,29 @@ export namespace FinancialManager {
             'SELECT balance FROM accounts WHERE email = :ownerEmail',
             [ownerEmail]
         );
-        
-        await connection.close();
-        console.log(result.rows);
-        // Retorna o saldo da carteira se houver registros  
-        return result.rows && result.rows.length > 0 ? result.rows[0] : false;
-        
+
+        if (result.rows && result.rows.length > 0) {
+            const balance = (result.rows[0] as { BALANCE: number }).BALANCE;
+            await connection.close();
+            return balance;
+        } else {
+            await connection.close();
+            return undefined;
+        }
     }
 
     export const getWalletHandler: RequestHandler = async (req: Request, res: Response) => {
         const pEmail = req.get('email');
 
-        if (pEmail) { 
+        if(pEmail){ 
             const balance = await getWallet(pEmail);
-            if (balance !== false) {
-                console.log(balance);
-                res.status(200).send(`Saldo da carteira encontrado: ${balance}`);
-            } else {
-                res.status(400).send(`Carteira não encontrada para o email: ${pEmail}`);
+            if(balance){
+                res.statusCode = 200;
+                res.send(`Saldo da carteira encontrado: R$${balance}`);
+            }else{
+                res.statusCode = 400;
+                res.send(`Carteira não encontrada para o email: ${pEmail}`);
             }
-        } else {
-            res.status(400).send('Email não fornecido');
         }
     }
 
@@ -119,10 +120,6 @@ export namespace FinancialManager {
     };
 
 
-// /withdrawFunds (“Sacar fundos” - Uma vez que um apostador creditou algum valor ou
-//     tem fundos na carteira, recebeu prêmios ou quer simplesmente “sacar” o que tem em carteira,
-//     esse valor deverá ser transferido para a conta corrente informada).
-
     async function withdrawFunds(ownerEmail: string, saque: number) {
         
 
@@ -151,27 +148,27 @@ export namespace FinancialManager {
             return false;
         }
     }
+
     export const withdrawFundsHandler: RequestHandler = async (req: Request, res: Response) => {
         const pEmail = req.get('email');
         const pSaque= req.get('saque');
+
         if (pEmail && pSaque) {
             var saque = parseFloat(pSaque);
-            if (saque > 5000 && saque <= 100000) {
-                saque = saque - saque * 0.01;
+            const balance = await getWallet(pEmail);
+            
+            if (saque > 101000) {
+                res.status(400).send('Quantia de saque ecedeu o limite diário');
             };
-            if (saque > 1000 && saque <= 5000) {
-                saque = saque - saque * 0.02;
-            };
-            if (saque > 100 && saque <= 1000) {
-                saque = saque - saque * 0.03;
-            };
-            if (saque > 0 && saque <= 100) {
-                saque = saque - saque * 0.04;
-            };
+
+            if (balance){
+                if (saque > balance){
+                    res.status(400).send('Saldo insuficiente para realizar o saque');
+                }
+            }
+
             if (saque > 0 && await withdrawFunds(pEmail, saque)) {
-                if (saque > 101000) {
-                    res.status(400).send('Quantia de saque ecedeu o limite diário');
-                };
+                
             res.status(200).send(`Saque concluído com sucesso!`);
             } else {
             res.status(400).send('Quantia de saque inválida ou email não encontrado');
