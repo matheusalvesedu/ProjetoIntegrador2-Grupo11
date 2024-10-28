@@ -25,7 +25,9 @@ routes.post('/deleteEvent', EventsHandler.deleteEventHandler);
 routes.post('/addFunds', FinancialManager.addFundsHandler);
 routes.post('/withdrawFunds', FinancialManager.withdrawFundsHandler);
 routes.post('/evaluateEvent', EventsHandler.evaluateEventHandler);
-// routes.get('/searchEvents', EventsHandler.searchEventsHandler);
+routes.get('/searchEvents', EventsHandler.searchEventsHandler);
+routes.get('/getEvents', EventsHandler.getEventsHandler);
+routes.put('/betOnEvent', EventsHandler.betOnEventsHandler);
 
 server.use(routes);
 

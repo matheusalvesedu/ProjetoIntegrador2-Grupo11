@@ -52,6 +52,7 @@ INSERT INTO EVENTS(
     eventFinalDate,
     event_status,
     FK_ACCOUNT_ID
+
 ) VALUES (
     SEQ_EVENTS.NEXTVAL,
     'Evento de Teste',
@@ -61,4 +62,35 @@ INSERT INTO EVENTS(
     'Pendente',
     '1'
 )
+commit;
 
+DROP TABLE BETS;
+DROP SEQUENCE SEQ_BETS;
+
+CREATE SEQUENCE SEQ_BETS START WITH 1 INCREMENT BY 1;
+
+CREATE TABLE BETS(
+    bet_id INT PRIMARY KEY,
+    bet_value DECIMAL ,
+    bet_option VARCHAR(10) NOT NULL,
+    FK_ACCOUNT_EMAIL VARCHAR2(100) NOT NULL,
+    FK_EVENT_ID INT NOT NULL,
+    FOREIGN KEY (FK_ACCOUNT_EMAIL) REFERENCES ACCOUNTS(email),
+    FOREIGN KEY (FK_EVENT_ID) REFERENCES EVENTS(event_id)
+);
+
+INSERT INTO BETS(
+    bet_id,
+    bet_value,
+    bet_option,
+    FK_ACCOUNT_EMAIL,
+    FK_EVENT_ID
+) VALUES (
+    SEQ_BETS.NEXTVAL,
+    100,
+    'SIM',
+    'Mu0',
+    1
+);
+commit;
+    

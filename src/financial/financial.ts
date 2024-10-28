@@ -30,7 +30,7 @@ export namespace FinancialManager {
     }
 
     // Função para obter o saldo de uma carteira
-    async function getWallet(ownerEmail: string): Promise<number | undefined> {
+    export async function getWallet(ownerEmail: string): Promise<number | undefined> {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         const connection = await OracleDB.getConnection({
@@ -156,24 +156,27 @@ export namespace FinancialManager {
         if (pEmail && pSaque) {
             var saque = parseFloat(pSaque);
             const balance = await getWallet(pEmail);
-            
-            if (saque > 101000) {
-                res.status(400).send('Quantia de saque ecedeu o limite diário');
-            };
 
             if (balance){
                 if (saque > balance){
                     res.status(400).send('Saldo insuficiente para realizar o saque');
                 }
             }
+            
+            // criar saque diário total
+            if (saque > 101000) {
+                res.status(400).send('Quantia de saque ecedeu o limite diário');
+            };
+
+            
 
             if (saque > 0 && await withdrawFunds(pEmail, saque)) {
-                
-            res.status(200).send(`Saque concluído com sucesso!`);
-            } else {
-            res.status(400).send('Quantia de saque inválida ou email não encontrado');
-            }
-        } else {
+                res.status(200).send(`Saque concluído com sucesso!`);
+                } else {
+                res.status(400).send('Quantia de saque inválida ou email não encontrado');
+                }
+        } 
+        else {
             res.status(400).send('Email ou quantia de saque não fornecidos');
         }
     }
