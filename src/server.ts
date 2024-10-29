@@ -28,6 +28,7 @@ routes.post('/evaluateEvent', EventsHandler.evaluateEventHandler);
 routes.get('/searchEvents', EventsHandler.searchEventsHandler);
 routes.get('/getEvents', EventsHandler.getEventsHandler);
 routes.put('/betOnEvent', EventsHandler.betOnEventsHandler);
+routes.post('/finishEvent', EventsHandler.finishEventHandler);
 
 server.use(routes);
 

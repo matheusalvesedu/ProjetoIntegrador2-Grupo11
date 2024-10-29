@@ -164,7 +164,6 @@ export namespace EventsHandler {
         }
     };
 
-
     async function getEvents(status_event: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
@@ -235,7 +234,7 @@ export namespace EventsHandler {
         await connection.close();
     };
 
-    async function verifyAccount(email: string) : Promise<boolean> {
+    async function verifyAccount(email: string): Promise<boolean> {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         let connection = await OracleDB.getConnection({
@@ -256,7 +255,6 @@ export namespace EventsHandler {
         }
     }
 
-
     export const betOnEventsHandler: RequestHandler = async (req: Request, res: Response) => {
         const event_id = req.get('event_id');
         const pemail = req.get('email');
@@ -264,23 +262,136 @@ export namespace EventsHandler {
         const bet_option = req.get('bet_option');
 
         if (event_id && pemail && bet_value && bet_option) {
-            if (await verifyAccount(pemail)) {
-                const walletBalance = await FinancialManager.getWallet(pemail);
-                if (walletBalance) {
-                    if (walletBalance < parseFloat(bet_value) && parseFloat(bet_value) >= 1) {
-                        res.status(400).send('Saldo Insuficiente .');
+            if (parseFloat(bet_value) >= 1) {
+                if (await verifyAccount(pemail)) {
+                    const walletBalance = await FinancialManager.getWallet(pemail);
+                    if (walletBalance) {
+                        if (walletBalance < parseFloat(bet_value)) {
+                            res.status(400).send('Saldo Insuficiente .');
+                        } else {
+                            await betOnEvents(parseInt(event_id), pemail, parseFloat(bet_value), bet_option);
+                            res.status(201).send('Aposta Realizada Com Sucesso.');
+                        }
                     } else {
-                        await betOnEvents(parseInt(event_id), pemail, parseFloat(bet_value), bet_option);
-                        res.status(201).send('Aposta Realizada Com Sucesso.');
+                        res.status(400).send('Saldo não encontrado.');
                     }
                 } else {
-                    res.status(400).send('Saldo não encontrado.');
+                    res.status(404).send('Conta não encontrada.');
                 }
             } else {
-                res.status(404).send('Conta não encontrada.');
+                res.status(400).send('Valor da Aposta Inválido. Por Favor, insira mais que R$1,00.');
             }
-        } else{
-            res.status(400).send('Parâmetros Faltando.');
+        } else {
+            res.send(400).send('Parâmetros Faltando.');
         }
     };
-}
+
+    async function finishEvent(event_id: number, event_veredict: string) {
+
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        let connection = await OracleDB.getConnection({
+            user: process.env.ORACLE_USER,
+            password: process.env.ORACLE_PASSWORD,
+            connectString: process.env.ORACLE_CONN_STR
+        });
+
+        await connection.execute(
+            `UPDATE EVENTS SET event_status = 'finalizado' WHERE event_id = :event_id`,
+            [event_id]
+        );
+
+        await connection.execute(
+            `UPDATE EVENTS SET event_veredict = :event_veredict WHERE event_id = :event_id`,
+            [event_veredict, event_id]
+        );
+
+        await connection.execute(
+            `UPDATE EVENTS SET amount_wins = (SELECT SUM(bet_value) FROM BETS WHERE FK_EVENT_ID = :event_id AND bet_option = :event_veredict) WHERE event_id = :event_id`,
+            [event_id]
+        )
+        await connection.execute(
+            `UPDATE EVENTS SET amount_loses = (SELECT SUM(bet_value) FROM BETS WHERE FK_EVENT_ID = :event_id AND bet_option != :event_veredict) WHERE event_id = :event_id`,
+            [event_id]
+        )
+
+        await connection.commit();
+        await connection.close();
+    }
+
+    async function distributeValues(event_id: number, event_veredict: string) {
+
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        let connection = await OracleDB.getConnection({
+            user: process.env.ORACLE_USER,
+            password: process.env.ORACLE_PASSWORD,
+            connectString: process.env.ORACLE_CONN_STR
+        });
+
+
+        // Obter todos os valores de aposta para os vencedores no evento específico
+        const result = await connection.execute(
+            `SELECT BET_VALUE, FK_ACCOUNT_EMAIL 
+            FROM BETS 
+            WHERE FK_EVENT_ID = :event_id 
+            AND BET_OPTION = :user_option`,
+            { event_id: event_id, user_option: event_veredict }
+        );
+
+        if (result.rows && result.rows.length > 0) {
+            // Calcular o prêmio para cada vencedor
+            for (const row of result.rows) {
+                const result_amount_wins = await connection.execute(
+                    `SELECT SUM(BET_VALUE) AS TOTAL FROM BETS WHERE FK_EVENT_ID = :event_id AND BET_OPTION = :event_veredict`,
+                    { event_id: event_id, event_veredict: event_veredict }
+                );
+                const result_amount_loses = await connection.execute(
+                    `SELECT SUM(BET_VALUE) AS TOTAL FROM BETS WHERE FK_EVENT_ID = :event_id AND BET_OPTION != :event_veredict`,
+                    { event_id: event_id, event_veredict: event_veredict }
+                );
+
+                if ((result_amount_wins.rows && result_amount_wins.rows.length > 0) && (result_amount_loses.rows && result_amount_loses.rows.length > 0)) {
+                    const amount_wins = (result_amount_wins.rows[0] as { amount_wins: number }).amount_wins;
+                    const amount_loses = (result_amount_loses.rows[0] as { amount_loses: number }).amount_loses;
+
+                    if (typeof row === 'object' && row !== null) {
+                        let betValue = (row as any).BET_VALUE; // Valor da aposta de cada vencedor
+                        let email = (row as any).FK_ACCOUNT_EMAIL; // Email do usuário vencedor
+
+                        // Calcular a proporção e o prêmio individual
+                        var proportion = betValue / amount_wins;
+                        const prize = amount_loses * proportion;
+
+                        // Atualizar o saldo do vencedor com o prêmio calculado
+                        await connection.execute(
+                            `UPDATE ACCOUNTS 
+                        SET balance = balance + :prize 
+                        WHERE email = :email`,
+                            { prize: prize, email: email }
+                        );
+                    }
+                }
+            }
+
+            await connection.commit();
+            await connection.close();
+        }
+    }
+
+        export const finishEventHandler: RequestHandler = async (req: Request, res: Response) => {
+            const event_id = req.get('event_id');
+            const event_veredict = req.get('event_veredict');
+
+
+            if (event_id && event_veredict) {
+                await finishEvent(parseInt(event_id), event_veredict);
+                await distributeValues(parseInt(event_id), event_veredict);
+
+                res.status(200).send('Evento Finalizado Com Sucesso.');
+            } else {
+                res.status(400).send('Parâmetros Faltando.');
+            }
+        }
+    }
+

@@ -136,7 +136,6 @@ export namespace AccountsHandler {
             await connection.close();
 
         } else {
-            // Verifica se algum parâmetro está faltando
             res.status(400).send('Requisição inválida - Parâmetros faltando.');
         }
     };
