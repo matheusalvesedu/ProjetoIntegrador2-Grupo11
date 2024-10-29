@@ -286,7 +286,7 @@ export namespace EventsHandler {
         }
     };
 
-    async function finishEvent(event_id: number, event_veredict: string) {
+    async function finishEvent(event_id: number, event_verdict: string) {
 
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
@@ -302,24 +302,24 @@ export namespace EventsHandler {
         );
 
         await connection.execute(
-            `UPDATE EVENTS SET event_veredict = :event_veredict WHERE event_id = :event_id`,
-            [event_veredict, event_id]
+            `UPDATE EVENTS SET verdict = :event_verdict WHERE event_id = :event_id`,
+            [event_verdict, event_id]
         );
 
         await connection.execute(
-            `UPDATE EVENTS SET amount_wins = (SELECT SUM(bet_value) FROM BETS WHERE FK_EVENT_ID = :event_id AND bet_option = :event_veredict) WHERE event_id = :event_id`,
-            [event_id]
+            `UPDATE EVENTS SET amount_wins = (SELECT SUM(bet_value) FROM BETS WHERE FK_EVENT_ID = :event_id AND bet_option = :event_verdict) WHERE event_id = :event_id`,
+            { event_id: event_id, event_verdict: event_verdict }
         )
         await connection.execute(
-            `UPDATE EVENTS SET amount_loses = (SELECT SUM(bet_value) FROM BETS WHERE FK_EVENT_ID = :event_id AND bet_option != :event_veredict) WHERE event_id = :event_id`,
-            [event_id]
+            `UPDATE EVENTS SET amount_loses = (SELECT SUM(bet_value) FROM BETS WHERE FK_EVENT_ID = :event_id AND bet_option != :event_verdict) WHERE event_id = :event_id`,
+            { event_id: event_id, event_verdict: event_verdict }
         )
 
         await connection.commit();
         await connection.close();
     }
 
-    async function distributeValues(event_id: number, event_veredict: string) {
+    async function distributeValues(event_id: number, event_verdict: string) {
 
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
@@ -336,24 +336,23 @@ export namespace EventsHandler {
             FROM BETS 
             WHERE FK_EVENT_ID = :event_id 
             AND BET_OPTION = :user_option`,
-            { event_id: event_id, user_option: event_veredict }
+            { event_id: event_id, user_option: event_verdict }
         );
 
         if (result.rows && result.rows.length > 0) {
             // Calcular o prêmio para cada vencedor
             for (const row of result.rows) {
                 const result_amount_wins = await connection.execute(
-                    `SELECT SUM(BET_VALUE) AS TOTAL FROM BETS WHERE FK_EVENT_ID = :event_id AND BET_OPTION = :event_veredict`,
-                    { event_id: event_id, event_veredict: event_veredict }
+                    `SELECT SUM(BET_VALUE) AS TOTAL FROM BETS WHERE FK_EVENT_ID = :event_id AND BET_OPTION = :event_verdict`,
+                    { event_id: event_id, event_verdict: event_verdict }
                 );
                 const result_amount_loses = await connection.execute(
-                    `SELECT SUM(BET_VALUE) AS TOTAL FROM BETS WHERE FK_EVENT_ID = :event_id AND BET_OPTION != :event_veredict`,
-                    { event_id: event_id, event_veredict: event_veredict }
+                    `SELECT SUM(BET_VALUE) AS TOTAL FROM BETS WHERE FK_EVENT_ID = :event_id AND BET_OPTION != :event_verdict`,
+                    { event_id: event_id, event_verdict: event_verdict }
                 );
-
                 if ((result_amount_wins.rows && result_amount_wins.rows.length > 0) && (result_amount_loses.rows && result_amount_loses.rows.length > 0)) {
-                    const amount_wins = (result_amount_wins.rows[0] as { amount_wins: number }).amount_wins;
-                    const amount_loses = (result_amount_loses.rows[0] as { amount_loses: number }).amount_loses;
+                    const amount_wins = (result_amount_wins.rows[0] as any).TOTAL;
+                    const amount_loses = (result_amount_loses.rows[0] as any).TOTAL;
 
                     if (typeof row === 'object' && row !== null) {
                         let betValue = (row as any).BET_VALUE; // Valor da aposta de cada vencedor
@@ -366,9 +365,9 @@ export namespace EventsHandler {
                         // Atualizar o saldo do vencedor com o prêmio calculado
                         await connection.execute(
                             `UPDATE ACCOUNTS 
-                        SET balance = balance + :prize 
+                        SET balance = balance + :prize + :betValue
                         WHERE email = :email`,
-                            { prize: prize, email: email }
+                            { prize: prize, email: email, betValue: betValue }
                         );
                     }
                 }
@@ -381,12 +380,12 @@ export namespace EventsHandler {
 
         export const finishEventHandler: RequestHandler = async (req: Request, res: Response) => {
             const event_id = req.get('event_id');
-            const event_veredict = req.get('event_veredict');
+            const event_verdict = req.get('event_verdict');
 
 
-            if (event_id && event_veredict) {
-                await finishEvent(parseInt(event_id), event_veredict);
-                await distributeValues(parseInt(event_id), event_veredict);
+            if (event_id && event_verdict) {
+                await finishEvent(parseInt(event_id), event_verdict);
+                await distributeValues(parseInt(event_id), event_verdict);
 
                 res.status(200).send('Evento Finalizado Com Sucesso.');
             } else {

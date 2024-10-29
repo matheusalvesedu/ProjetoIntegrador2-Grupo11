@@ -4,7 +4,7 @@ import { AccountsHandler } from "./accounts/accounts";
 import { FinancialManager } from "./financial/financial";
 import { EventsHandler } from "./events/events";
 
-const port = 3000; 
+const port = 3001; 
 const server = express();
 const routes = Router();
 
