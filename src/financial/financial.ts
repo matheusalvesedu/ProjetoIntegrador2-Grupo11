@@ -6,7 +6,6 @@ dotenv.config();
 
 export namespace FinancialManager {
 
-    // Função para obter o saldo de uma carteira
     export async function getWallet(ownerEmail: string): Promise<number | undefined> {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
@@ -16,7 +15,6 @@ export namespace FinancialManager {
             connectString: process.env.ORACLE_CONN_STR
         });
 
-        // Executar a consulta no banco de dados
         const result = await connection.execute(
             'SELECT balance FROM accounts WHERE email = :ownerEmail',
             [ownerEmail]
@@ -131,9 +129,10 @@ export namespace FinancialManager {
                 if (saque > balance) {
                     res.status(400).send('Saldo insuficiente para realizar o saque');
                 }
+            } else {
+                res.status(400).send('Saldo não encontrado para o email: ' + pEmail);
             }
 
-            // criar saque diário total
             if (saque > 101000) {
                 res.status(400).send('Quantia de saque ecedeu o limite diário');
             };

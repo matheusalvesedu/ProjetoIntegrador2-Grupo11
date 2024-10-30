@@ -7,19 +7,9 @@ dotenv.config();
 
 export namespace EventsHandler {
 
-    export type Event = {
-        eventId: number;
-        eventTitle: string;
-        eventDescription: string;
-        eventStartDate: string;
-        eventFinalDate: string;
-        eventStatus: string;
-    };
-
     async function addNewEvent(eventTitle: string, eventDescription: string, eventStart: string, eventFinal: string, FK_ACCOUNT_ID: number) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
-        // Conectar ao banco de dados
         let connection = await OracleDB.getConnection({
             user: process.env.ORACLE_USER,
             password: process.env.ORACLE_PASSWORD,
@@ -57,7 +47,6 @@ export namespace EventsHandler {
         await connection.close();
     }
 
-    // Handler para processar a requisição de adicionar eventos
     export const addNewEventsHandler: RequestHandler = async (req: Request, res: Response) => {
         const eventTitle = req.get('event_title');
         const eventDescription = req.get('event_description');
@@ -65,8 +54,6 @@ export namespace EventsHandler {
         const eventFinalDate = req.get('eventFinalDate');
         const pFK_ID = req.get('FK_ACCOUNT_ID');
 
-        // Verifica se os parâmetros obrigatórios foram enviados
-        // Verifica se as datas estão no formato dd/mm/yyyy
         const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
         if (!eventStartDate || !eventFinalDate || !dateRegex.test(eventStartDate) || !dateRegex.test(eventFinalDate)) {
             res.status(400).send('Datas devem estar no formato dd/mm/yyyy.');
@@ -112,7 +99,7 @@ export namespace EventsHandler {
     async function evaluateEvent(eventId: number, event_status: string, desc: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
-        let connection = await OracleDB.getConnection({
+        const connection = await OracleDB.getConnection({
             user: process.env.ORACLE_USER,
             password: process.env.ORACLE_PASSWORD,
             connectString: process.env.ORACLE_CONN_STR
@@ -152,7 +139,7 @@ export namespace EventsHandler {
             connectString: process.env.ORACLE_CONN_STR
         });
 
-        const result = await connection.execute(
+        let result = await connection.execute(
             `SELECT * FROM EVENTS WHERE event_title LIKE '%${keyword}%' OR event_description LIKE '%${keyword}%'`
         );
 
@@ -179,7 +166,7 @@ export namespace EventsHandler {
             connectString: process.env.ORACLE_CONN_STR
         });
 
-        const result = await connection.execute(
+        let result = await connection.execute(
             `SELECT * FROM EVENTS WHERE event_status = '${status_event}'`
         );
 
@@ -249,7 +236,7 @@ export namespace EventsHandler {
             connectString: process.env.ORACLE_CONN_STR
         });
 
-        const result = await connection.execute(
+        let result = await connection.execute(
             `SELECT * FROM ACCOUNTS WHERE email = :email`,
             [email]
         );
@@ -267,7 +254,7 @@ export namespace EventsHandler {
         const bet_value = req.get('bet_value');
         const bet_option = req.get('bet_option');
 
-    // adicionar verificaçao se o evento esta com status de aprovado
+        // adicionar verificaçao se o evento esta com status de aprovado
 
         if (event_id && pemail && bet_value && bet_option) {
             if (parseFloat(bet_value) >= 1) {
@@ -386,19 +373,19 @@ export namespace EventsHandler {
         }
     }
 
-        export const finishEventHandler: RequestHandler = async (req: Request, res: Response) => {
-            const event_id = req.get('event_id');
-            const event_verdict = req.get('event_verdict');
+    export const finishEventHandler: RequestHandler = async (req: Request, res: Response) => {
+        const event_id = req.get('event_id');
+        const event_verdict = req.get('event_verdict');
 
 
-            if (event_id && event_verdict) {
-                await finishEvent(parseInt(event_id), event_verdict);
-                await distributeValues(parseInt(event_id), event_verdict);
+        if (event_id && event_verdict) {
+            await finishEvent(parseInt(event_id), event_verdict);
+            await distributeValues(parseInt(event_id), event_verdict);
 
-                res.status(200).send('Evento Finalizado Com Sucesso.');
-            } else {
-                res.status(400).send('Parâmetros Faltando.');
-            }
+            res.status(200).send('Evento Finalizado Com Sucesso.');
+        } else {
+            res.status(400).send('Parâmetros Faltando.');
         }
     }
+}
 

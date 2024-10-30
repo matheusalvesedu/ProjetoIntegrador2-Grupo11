@@ -1,35 +1,18 @@
 import { Request, RequestHandler, Response } from "express";
 import OracleDB from "oracledb";
-import dotenv from 'dotenv'; 
+import dotenv from 'dotenv';
 dotenv.config();
 
-
-    // Namespace que contém tudo sobre "contas de usuários"
 export namespace AccountsHandler {
-    
-    // Tipo UserAccount
-    export type UserAccount = {
-        id: number | undefined;
-        complete_name: string;
-        email: string;
-        password: string | undefined;
-        birthday_date: string | undefined;
-        user_type: string | undefined;
-        balance: number | undefined;
-    };
 
-    // Função para validar credenciais
     async function validateCredentials(email: string, password: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
-        // Conectar-se ao Oracle
-        const connection = await OracleDB.getConnection({
+        let connection = await OracleDB.getConnection({
             user: process.env.ORACLE_USER,
             password: process.env.ORACLE_PASSWORD,
             connectString: process.env.ORACLE_CONN_STR
         });
-
-        // Executar a consulta para verificar se o e-mail e a senha existem
         const result = await connection.execute(
             'SELECT * FROM ACCOUNTS WHERE email = :email AND password = :password',
             [email, password]
@@ -37,22 +20,35 @@ export namespace AccountsHandler {
 
         await connection.close();
 
-        // Retorna verdadeiro se existirem registros
-        return result.rows && result.rows.length > 0; // Retorna true se houver pelo menos uma linha
+        return result.rows && result.rows.length > 0;
     }
 
     async function login(email: string, password: string) {
-        return await validateCredentials(email, password); // Retorna diretamente o resultado da validação
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        let connection = await OracleDB.getConnection({
+            user: process.env.ORACLE_USER,
+            password: process.env.ORACLE_PASSWORD,
+            connectString: process.env.ORACLE_CONN_STR
+        });
+
+        await connection.execute(
+            'UPDATE ACCOUNTS SET token = dbms_random.string(\'X\', 10) WHERE email = :email AND password = :password',
+            [email, password],
+            { autoCommit: true }
+        );
+
+        return await validateCredentials(email, password);
     }
 
-    export const loginHandler: RequestHandler = 
+    export const loginHandler: RequestHandler =
         async (req: Request, res: Response) => {
-            const pEmail = req.get('email'); 
-            const pPassword = req.get('password'); 
+            const pEmail = req.get('email');
+            const pPassword = req.get('password');
 
             if (pEmail && pPassword) {
-                // Chamar a função de login. 
                 const isLoggedIn = await login(pEmail, pPassword);
+
                 if (isLoggedIn) {
                     res.status(200).send('Login realizado com sucesso.');
                 } else {
@@ -63,11 +59,10 @@ export namespace AccountsHandler {
             }
         }
 
-
     async function signUp(name: string, email: string, password: string, birthday_date: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
-        const connection = await OracleDB.getConnection({
+        let connection = await OracleDB.getConnection({
             user: process.env.ORACLE_USER,
             password: process.env.ORACLE_PASSWORD,
             connectString: process.env.ORACLE_CONN_STR
@@ -81,16 +76,14 @@ export namespace AccountsHandler {
         await connection.close();
     }
 
-    // Handler para o cadastro de novos usuários
     export const signUpHandler: RequestHandler = async (req: Request, res: Response) => {
-        const pName = req.get('complete_name'); 
+        const pName = req.get('complete_name');
         const pEmail = req.get('email');
         const pPassword = req.get('password');
         const pBirthday_date = req.get('birthday_date');
 
         if (pName && pEmail && pPassword && pBirthday_date) {
-            // Conexão com o banco de dados para verificar se o e-mail já existe
-            const connection = await OracleDB.getConnection({
+            let connection = await OracleDB.getConnection({
                 user: process.env.ORACLE_USER,
                 password: process.env.ORACLE_PASSWORD,
                 connectString: process.env.ORACLE_CONN_STR
@@ -125,10 +118,10 @@ export namespace AccountsHandler {
             );
 
             if (result.rows && result.rows.length > 0) {
-                // Se o usuário já estiver cadastrado
+
                 res.status(400).send('Usuário já cadastrado.');
             } else {
-                // Se o usuário não estiver cadastrado, faz o cadastro
+
                 await signUp(pName, pEmail, pPassword, pBirthday_date);
                 res.status(200).send('Usuário cadastrado com sucesso.');
             }
@@ -139,4 +132,4 @@ export namespace AccountsHandler {
             res.status(400).send('Requisição inválida - Parâmetros faltando.');
         }
     };
-    }
+}
