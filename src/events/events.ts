@@ -41,7 +41,7 @@ export namespace EventsHandler {
             :eventDescription,
             :eventStart,
             :eventFinal,
-            'Pendente',
+            'pendente',
             :FK_ACCOUNT_ID
             )`,
             {
@@ -66,6 +66,12 @@ export namespace EventsHandler {
         const pFK_ID = req.get('FK_ACCOUNT_ID');
 
         // Verifica se os parâmetros obrigatórios foram enviados
+        // Verifica se as datas estão no formato dd/mm/yyyy
+        const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+        if (!eventStartDate || !eventFinalDate || !dateRegex.test(eventStartDate) || !dateRegex.test(eventFinalDate)) {
+            res.status(400).send('Datas devem estar no formato dd/mm/yyyy.');
+            return;
+        }
         if (eventTitle && eventDescription && eventStartDate && eventFinalDate && pFK_ID) {
             await addNewEvent(eventTitle, eventDescription, eventStartDate, eventFinalDate, parseInt(pFK_ID));
             res.status(201).send('Evento Criado Com Sucesso. Aguarde a Aprovação.');
@@ -84,7 +90,7 @@ export namespace EventsHandler {
         });
 
         await connection.execute(
-            `UPDATE EVENTS SET event_status = 'Excluído' WHERE EVENT_ID = :eventId`,
+            `UPDATE EVENTS SET event_status = 'excluído' WHERE EVENT_ID = :eventId`,
             [eventId]
         );
 
@@ -260,6 +266,8 @@ export namespace EventsHandler {
         const pemail = req.get('email');
         const bet_value = req.get('bet_value');
         const bet_option = req.get('bet_option');
+
+    // adicionar verificaçao se o evento esta com status de aprovado
 
         if (event_id && pemail && bet_value && bet_option) {
             if (parseFloat(bet_value) >= 1) {
