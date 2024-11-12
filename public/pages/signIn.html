@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <link rel="stylesheet" href="../style/reset.css">
+    <link rel="stylesheet" href="../style/signIn.css">
+    <script src="../script/signIn.js"></script>
+</head>
+
+<body>
+    <header>
+        <section class="header_container">
+            <div class="header-logo">
+                <img src="../assets/logo.png" alt="LogoDonaBet">
+            </div>
+            <div class="header-buttons">
+                <nav>
+                    <a href="#" id="buttonHeaderSignIn">Sign In</a>
+                    <a href="#" id="buttonHeaderSignUp">Sign Up</a>
+                </nav>
+            </div>
+        </section>
+    </header>
+    <main class="container">
+        <div class="container_content">
+            <section class="container_input_text">
+                <h1>Sign In</h1>    
+                <form>
+                    <p>
+                        <label for="fieldEmail">Email: </label><br>
+                        <input type="email" id="fieldEmail" placeholder="Enter your email" onfocus="cleanError()">
+                    </p>
+                    <p>
+                        <label for="fieldPassword">Password:</label><br>
+                        <input type="password" id="fieldPassword" placeholder="Enter your password"
+                            onfocus="cleanError()">
+                    </p>
+                    <button type="button" id="btnSignIn" onclick="performSignIn()">Sign In</button>
+                    <div class="additional_links">
+                        <p class="signup_text">Don't have an account? <a href="#" class="signup_link">Sign Up</a></p>
+                    </div>
+                </form>
+                <div id="messageBox">
+                    <p id="message">Please fill your email field.</p>
+                </div>
+            </section>
+        </div>
+    </main>
+</body>
+
+</html>

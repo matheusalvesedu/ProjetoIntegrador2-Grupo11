@@ -1,0 +1,203 @@
+:root {
+    /* cores principais */
+    --color-primary: #181419;
+    --color-secondary: #9e0b41;
+    --color-tertiary: #FFFCF5;  
+    --color-quaternary: #cc3e18;
+    --color-quinary: #f0971c;
+    --color-senary: #4a073c;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--color-primary);
+    Font-family: Arial, Helvetica, sans-serif ;
+}
+
+header {
+    display: flex;
+    justify-content: center; /* Centraliza o container do header */
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: var(--color-primary);
+    color: var(--color-tertiary);
+}
+
+.header_container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    max-width: auto;
+}
+
+.header-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+#buttonHeaderSignIn, 
+#buttonHeaderSignUp {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+#buttonHeaderSignIn {
+    background-color: transparent;
+    color: var(--color-tertiary);
+    border: 1px solid var(--color-tertiary);
+}
+
+#buttonHeaderSignIn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+#buttonHeaderSignUp {
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+}
+
+#buttonHeaderSignUp:hover {
+    background-color: #d4c164;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container_content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--color-secondary);
+    width: 310px;
+    height: 520px;
+    border-radius: 16px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 30px 20px;
+}
+
+.container_input_text {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+h1 {
+    font-size: 24px;
+    color: var(--color-primary);
+    margin-bottom: 30px;
+    text-align: center;
+    font-weight: bold;
+}
+
+form {  
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+form p {
+    width: 100%;
+}
+
+label {
+    color: var(--color-primary);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    display: inline-block;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--color-primary);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+    letter-spacing: 0.5px;
+    background-color: var(--color-tertiary);
+    transition: border-color 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--color-secondary);
+}
+
+#btnSignIn {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--color-primary);
+    color: var(--color-tertiary);
+    border: 2px solid var(--color-primary);
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+#btnSignIn:hover {
+    border-color: var(--color-secondary);
+    transition: border-color 0.3s ease;
+}
+
+.additional_links {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.signup_text {
+    color: var(--color-primary);
+    font-size: 14px;
+}
+
+.signup_link {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.signup_link:hover {
+    text-decoration: underline;
+}
+
+#messageBox {
+    margin-top: 20px;
+    width: 100%;
+    background-color: rgb(161, 141, 141);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+#message {
+    color: var(--color-primary);
+    font-size: 14px;
+    text-align: center;
+    font-weight: bold;
+}
+

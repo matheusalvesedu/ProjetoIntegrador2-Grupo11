@@ -3,6 +3,11 @@ import OracleDB from "oracledb";
 import dotenv from 'dotenv';
 dotenv.config();
 
+<<<<<<< Updated upstream
+=======
+
+// Namespace que contém tudo sobre "contas de usuários"
+>>>>>>> Stashed changes
 export namespace AccountsHandler {
 
     async function validateCredentials(email: string, password: string) {
