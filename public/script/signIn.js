@@ -16,6 +16,7 @@ function cleanError() {
 // se estiver retorna true, senao, false
 function isValid(email, password) {
     var valid = false;
+    
     if (email.length > 0 && password.length > 0) {
         valid = true;
     } else if (email.length == 0 && password.length == 0) {
@@ -25,6 +26,7 @@ function isValid(email, password) {
     } else {
         showErrorMessage("Please fill your password field.");
     }   
+
     return valid;
 }
 
@@ -32,6 +34,9 @@ async function performSignIn() {
 
     var email = document.getElementById("fieldEmail").value;
     var password = document.getElementById("fieldPassword").value;
+
+    console.log(email, password);
+    
     //remover eventuais espaços em brancos do email e da senha(antes e depois).
 
     email = email.trim();
@@ -46,14 +51,14 @@ async function performSignIn() {
         reqtHeaders.append("password", password);
 
         //prosseguir com a chamada do backend
-        const response = await fetch("http://localhost:3000/login", {
+        const response = await fetch("http://localhost:3001/login", {
             method: "POST",
             headers: reqtHeaders
         });
 
         // Tratamento da resposta
         if (response.ok) {
-            
+               
         }
     }
 }
