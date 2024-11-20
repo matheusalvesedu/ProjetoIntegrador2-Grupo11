@@ -124,6 +124,18 @@ export namespace FinancialManager {
         if (pEmail && pSaque) {
             var saque = parseFloat(pSaque);
             const balance = await getWallet(pEmail);
+            let taxa = 0;
+            if (saque <= 100) {
+                taxa = saque * 0.04;
+            } else if (saque <= 1000) {
+                taxa = saque * 0.03;
+            } else if (saque <= 5000) {
+                taxa = saque * 0.02;
+            } else if (saque <= 100000) {
+                taxa = saque * 0.01;
+            }
+            
+            
 
             if (balance) {
                 if (saque > balance) {
@@ -138,7 +150,7 @@ export namespace FinancialManager {
             };
 
             if (saque > 0 && await withdrawFunds(pEmail, saque)) {
-                res.status(200).send(`Saque concluído com sucesso!`);
+                res.status(200).send(`Saque concluído com sucesso! Valor de saque R$${saque} Valor recebido: R$${saque - taxa} Taxa: R$${taxa}`);
             } else {
                 res.status(400).send('Quantia de saque inválida ou email não encontrado');
             }
