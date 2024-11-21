@@ -10,8 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
-    <script src="../scripts/signIn.js" defer> </script>
-    
+    <script src="../script/signIn.js" defer></script>
     <link rel="stylesheet" href="../style/signIn.css">
 </head>
 
@@ -24,8 +23,8 @@
             </ul>
         </nav>
         <div class="button-container">
-            <a href= "../pages/signIn.html"> <button id="login-btn" class="btn btn-primary me-2">Login</button></a>
-            <a href= "../pages/signUp.html"> <button id="signup-btn" class="btn-primary me-2">Cadastro</button></a>
+            <a href="../pages/signIn.html"><button id="login-btn" class="btn btn-primary me-2">Login</button></a>
+            <a href="../pages/signUp.html"><button id="signup-btn" class="btn-primary me-2">Cadastro</button></a>
         </div>
     </header>
 
@@ -33,21 +32,21 @@
         <div class="row justify-content-center">
             <div class="col-md-6 form-container">
                 <h2 class="text-center mb-4">Entrar na Conta</h2>
-                <form>
+                <form onsubmit="performSignIn(event)">
                     <div class="form-group mb-3">
                         <label for="email">Email</label>
                         <input type="email" class="form-control" id="fieldEmail" placeholder="Digite seu email" required>
                     </div>
                     <div class="form-group mb-3">
                         <label for="senha">Senha</label>
-                        <input type="password" class="form-control" id="fieldPassword" placeholder="Digite sua senha" required>
+                        <input type="password" class="form-control" id="fieldPassword" placeholder="Digite sua senha"
+                            required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100" onclick="performSignIn()">Entrar</button>
+                    <button type="submit" class="btn btn-primary w-100">Entrar</button>
                 </form>
-                <div id="messageBox">
+                <div id="messageBox" style="display: none; color: rgb(250, 249, 249); margin-top: 10px;">
                     <p id="message"></p>
                 </div>
-
             </div>
         </div>
     </div>

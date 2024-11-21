@@ -1,0 +1,165 @@
+:root {
+    /* Variáveis de cores */
+    --color-primary: #181419;
+    --color-secondary: #9e0b41;
+    --color-tertiary: #FFFCF5;  
+    --color-quaternary: #cc3e18;
+    --color-quinary: #f0971c;
+    --color-senary: #4a073c;
+}
+
+/* Estilos globais */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--color-primary);
+    font-family: Arial, sans-serif;
+    color: var(--color-tertiary);
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+    background-color: var(--color-secondary);
+}
+
+header h1 {
+    font-size: 1.5rem;
+    color: var(--color-tertiary);
+}
+
+header a {
+    text-decoration: none;
+    color: var(--color-tertiary);
+    background-color: var(--color-quinary);
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+header a:hover {
+    background-color: #b97206;
+}
+
+/* Container principal */
+.container {
+    padding: 2rem 1rem;
+    max-width: 800px;
+    margin: auto;
+}
+
+/* Saldo */
+.saldo-container {
+    text-align: center;
+    background-color: var(--color-secondary);
+    border: 1px solid var(--color-quaternary);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.saldo-container h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--color-tertiary);
+}
+
+.saldo {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-quinary);
+    margin-bottom: 1rem;
+}
+
+button#addCreditsBtn {
+    padding: 0.75rem 1.5rem;
+    color: var(--color-tertiary);
+    background-color: var(--color-quinary);
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+
+button#addCreditsBtn:hover {
+    background-color: #b97206;
+}
+
+/* Histórico de Transações */
+.historico-container h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: var(--color-tertiary);
+}
+
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--color-secondary);
+    border: 1px solid var(--color-quaternary);
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-tertiary);
+}
+
+/* Saque */
+.sacar-container h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: var(--color-tertiary);
+}
+
+.sacar-container form {
+    background-color: var(--color-secondary);
+    border: 1px solid var(--color-quaternary);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.sacar-container .form-label {
+    color: var(--color-tertiary);
+    font-weight: bold;
+}
+
+.sacar-container .form-control {
+    border: 1px solid var(--color-quaternary);
+    color: var(--color-quinary);
+    border-radius: 4px;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    background-color: var(--color-primary);
+}
+
+.sacar-container .form-control::placeholder {
+    color: #b3b3b3;
+}
+
+button[type="submit"] {
+    display: block;
+    padding: 0.75rem;
+    border-radius: 4px;
+    color: var(--color-tertiary);
+    background-color: var(--color-quinary);
+    border: none;
+    font-weight: bold;
+    text-transform: uppercase;
+    width: 100%;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background-color: #b97206;
+}

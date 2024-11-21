@@ -92,15 +92,15 @@ export namespace AccountsHandler {
             });
 
             // Verifica se a data de nascimento tem o formato correto
-            const formato = /^\d{2}\/\d{2}\/\d{4}$/;
+            const formato = /^\d{4}-\d{2}-\d{2}$/;
             if (!formato.test(pBirthday_date)) {
-                res.status(400).send('Formato da data de nascimento inválido. O formato correto é dd/mm/yyyy.');
+                res.status(400).send('Formato da data de nascimento inválido. O formato correto é yyyy-mm-dd.');
                 await connection.close();
                 return;
             }
 
             // Converte a data de nascimento para o formato Date
-            const [day, month, year] = pBirthday_date.split('/').map(Number);
+            const [year, month, day] = pBirthday_date.split('-').map(Number);
             const birthDate = new Date(year, month - 1, day);
 
             // Verifica se o usuário tem pelo menos 18 anos

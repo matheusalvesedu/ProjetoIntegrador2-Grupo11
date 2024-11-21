@@ -1,64 +1,71 @@
-//exibir a div com o erro.
-function showErrorMessage(messageContent) {
-    //atribuir o texto da mensagem no paragrafo
-    document.getElementById("message").innerHTML = messageContent;
-    var divMb = document.getElementById("messageBox");
-    divMb.style.display = "block";
-}
+async function performSignIn(event) {
+    event.preventDefault(); // Evita o recarregamento da página ao enviar o formulário
 
-//funcao que oculta a div
-function cleanError() {
-    var divMb = document.getElementById("messageBox");
-    divMb.style.display = "none";
-}
+    const email = document.getElementById("fieldEmail").value.trim();
+    const password = document.getElementById("fieldPassword").value.trim();
 
-//verifica se o formulario esta válido(preenchido corretamente)
-// se estiver retorna true, senao, false
-function isValid(email, password) {
-    var valid = false;
-    
-    if (email.length > 0 && password.length > 0) {
-        valid = true;
-    } else if (email.length == 0 && password.length == 0) {
-        showErrorMessage("Please type your email and password");
-    } else if (email.length == 0) {
-        showErrorMessage("Please fill your email field.");
-    } else {
-        showErrorMessage("Please fill your password field.");
-    }   
+    if (!isValid(email, password)) {
+        return;
+    }
 
-    return valid;
-}
-
-async function performSignIn() {
-
-    var email = document.getElementById("fieldEmail").value;
-    var password = document.getElementById("fieldPassword").value;
-
-    console.log(email, password);
-    
-    //remover eventuais espaços em brancos do email e da senha(antes e depois).
-
-    email = email.trim();
-    password = password.trim();
-
-    if (isValid(email, password)) {
-
+    try {
+        // Configura os cabeçalhos com email e senha
         const reqtHeaders = new Headers();
-
-        reqtHeaders.append("Content-Type", "text/plain"); // Corrigido para "Content-Type"
         reqtHeaders.append("email", email);
         reqtHeaders.append("password", password);
 
-        //prosseguir com a chamada do backend
+        // Faz a requisição para o backend
         const response = await fetch("http://localhost:3001/login", {
             method: "POST",
-            headers: reqtHeaders
+            headers: reqtHeaders,
         });
 
-        // Tratamento da resposta
+        
         if (response.ok) {
-               
+            const data = await response.text();
+            showMessege(data); // Exibe a mensagem de sucesso (opcional)
+        } else if (response.status === 401) {
+            const data = await response.text();
+            showMessege(data);
+        }  else {
+            showMessege("Erro interno no servidor. Tente novamente mais tarde.");
         }
+    } catch (error) {
+        console.error("Erro na autenticação:", error);
+        showMessege("Erro de conexão. Verifique sua internet.");
     }
 }
+
+function isValid(email, password) {
+    if (!email) {
+        showMessege("O campo de email é obrigatório.");
+        return false;
+    }
+    if (!password) {
+        showMessege("O campo de senha é obrigatório.");
+        return false;
+    }
+    cleanError();
+    return true;
+}
+
+function showMessege(messageContent) {
+    const messageBox = document.getElementById("messageBox");
+    const message = document.getElementById("message");
+
+    if (!messageBox || !message) {
+        console.error("Elementos de mensagem não encontrados.");
+        return;
+    }
+
+    message.textContent = messageContent;
+    messageBox.style.display = "block";
+}
+
+function cleanError() {
+    const messageBox = document.getElementById("messageBox");
+    if (messageBox) {
+        messageBox.style.display = "none";
+    }
+}
+

@@ -3,11 +3,12 @@ import { Request, Response, Router } from "express";
 import { AccountsHandler } from "./accounts/accounts";
 import { FinancialManager } from "./financial/financial";
 import { EventsHandler } from "./events/events";
+import cors from "cors"
 
 const port = 3001; 
 const server = express();
 const routes = Router();
-
+server.use(cors());
 // Middleware para analisar o corpo da requisição
 server.use(express.json()); // Para lidar com JSON no corpo da requisição
 
