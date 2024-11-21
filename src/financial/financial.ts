@@ -82,7 +82,7 @@ export namespace FinancialManager {
             if (funds > 0 && await addFunds(pEmail, funds)) {
                 res.status(200).send(`Depósito concluído com sucesso!`);
             } else {
-                res.status(400).send('Quantia de depósito inválida ou email não encontrado');
+                res.status(400).send('Email incorreto. Não foi possível realizar o depósito');
             }
         } else {
             res.status(400).send('Email ou quantia de depósito não fornecidos');
