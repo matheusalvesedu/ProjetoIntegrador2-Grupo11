@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.1/css/all.css" crossorigin="anonymous">
+    <script>
+        produtos = [
+            {codigo: 100, nome: 'Camiseta', preco: 10.00}
+        ];
+
+        var paginaAtual = 1;
+
+        function addProduct(nome,preco){
+            // adicionar no array
+            // chamar a funcao para adiconar a linha no produto
+        }
+
+        function adicionarLinhaDeProduto(produto){
+            // adicionar uma linha na tabela
+        }
+
+
+        function carregarProdutos(){
+            // 
+        }
+
+        carregarProdutos(paginaAtual);
+        
+    </script>
+</head>
+<body>
+    <nav class="navbar bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo.svg" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+                SisMateus WebPro v20
+            </a>
+        </div>
+    </nav>
+    <div class="container" style="padding-top:20px;">
+        <div class="row">
+            <div class="col">
+                <h3>Produtos</h3>
+            </div>
+            <div class="col-md-auto">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Buscar produto...">
+                    <button class="btn btn-secondary" type="submit">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                </div>
+            </div>
+            <div class="col col-lg-1">
+                <button class="btn btn-primary" style="float:right;" data-bs-toggle="modal" data-bs-target="#addNewProduct">
+                    <i class="fas fa-plus"></i> Novo
+                </button>
+            </div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="text-end">#</th>
+                            <th scope="col" class="text-left">Nome</th>
+                            <th scope="col" class="text-end">Preço R$</th>
+                            <th scope="col" class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-end">101</td>
+                            <td>Camisa Polo</td>
+                            <td class="text-end">50,00</td>
+                            <td class="text-center">
+                                <i class="fas fa-edit"></i>
+                                <i class="fas fa-eye"></i>
+                                <i class="fas fa-times-circle"></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-end">102</td>
+                            <td>Calça Jeans</td>
+                            <td class="text-end">120,00</td>
+                            <td class="text-center">
+                                <i class="fas fa-edit"></i>
+                                <i class="fas fa-eye"></i>
+                                <i class="fas fa-times-circle"></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-end">103</td>
+                            <td>Jaqueta de Couro</td>
+                            <td class="text-end">250,00</td>
+                            <td class="text-center">
+                                <i class="fas fa-edit"></i>
+                                <i class="fas fa-eye"></i>
+                                <i class="fas fa-times-circle"></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-end">104</td>
+                            <td>Tênis Esportivo</td>
+                            <td class="text-end">200,00</td>
+                            <td class="text-center">
+                                <i class="fas fa-edit"></i>
+                                <i class="fas fa-eye"></i>
+                                <i class="fas fa-times-circle"></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-end">105</td>
+                            <td>Relógio de Pulso</td>
+                            <td class="text-end">150,00</td>
+                            <td class="text-center">
+                                <i class="fas fa-edit"></i>
+                                <i class="fas fa-eye"></i>
+                                <i class="fas fa-times-circle"></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-end">106</td>
+                            <td>Óculos de Sol</td>
+                            <td class="text-end">80,00</td>
+                            <td class="text-center">
+                                <i class="fas fa-edit"></i>
+                                <i class="fas fa-eye"></i>
+                                <i class="fas fa-times-circle"></i>
+                                <tr>
+                                    <td class="text-end">107</td>
+                                    <td>Bolsa Feminina</td>
+                                    <td class="text-end">180,00</td>
+                                    <td class="text-center">
+                                        <i class="fas fa-edit"></i>
+                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-times-circle"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end">108</td>
+                                    <td>Chapéu de Palha</td>
+                                    <td class="text-end">60,00</td>
+                                    <td class="text-center">
+                                        <i class="fas fa-edit"></i>
+                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-times-circle"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end">109</td>
+                                    <td>Carteira de Couro</td>
+                                    <td class="text-end">90,00</td>
+                                    <td class="text-center">
+                                        <i class="fas fa-edit"></i>
+                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-times-circle"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end">110</td>
+                                    <td>Meias de Algodão</td>
+                                    <td class="text-end">20,00</td>
+                                    <td class="text-center">
+                                        <i class="fas fa-edit"></i>
+                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-times-circle"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end">111</td>
+                                    <td>Gravata de Seda</td>
+                                    <td class="text-end">70,00</td>
+                                    <td class="text-center">
+                                        <i class="fas fa-edit"></i>
+                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-times-circle"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end">112</td>
+                                    <td>Blusa de Lã</td>
+                                    <td class="text-end">130,00</td>
+                                    <td class="text-center">
+                                        <i class="fas fa-edit"></i>
+                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-times-circle"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end">113</td>
+                                    <td>Saia Jeans</td>
+                                    <td class="text-end">110,00</td>
+                                    <td class="text-center">
+                                        <i class="fas fa-edit"></i>
+                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-times-circle"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end">114</td>
+                                    <td>Vestido de Festa</td>
+                                    <td class="text-end">300,00</td>
+                                    <td class="text-center">
+                                        <i class="fas fa-edit"></i>
+                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-times-circle"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end">115</td>
+                                    <td>Casaco de Inverno</td>
+                                    <td class="text-end">400,00</td>
+                                    <td class="text-center">
+                                        <i class="fas fa-edit"></i>
+                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-times-circle"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end">116</td>
+                                    <td>Luvas de Couro</td>
+                                    <td class="text-end">50,00</td>
+                                    <td class="text-center">
+                                        <i class="fas fa-edit"></i>
+                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-times-circle"></i>
+                                    </td>
+                                </tr>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <nav aria-label="...." style="float:right;">
+                    <ul class="pagination pagination-sm">
+                        <li class="page-item active" aria-current="page">
+                            <span class="page-link">1</span>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">2</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">3</a>
+                        </li>
+
+                    </ul>
+                </nav>
+                    
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="messageWithdraw" tabindex="-1"
+        aria-labelledby="addNewProductLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Novo Produto</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Preencha os campos abaixo para cadastrar um novo produto.
+                    </p>
+                    <form>
+                        <div class="mb-3">
+                            <label for="productName" class="form-label">Nome do Produto</label>
+                            <input type="text" class="form-control" id="productName" name="productName">
+                        </div>
+                        <div class="mb-3">
+                            <label for="productPrice" class="form-label">Preço do Produto</label>
+                            <input type="text" class="form-control w-25" id="productPrice" aria-describedby="ajudaCampoPreco">
+                            <div id="ajudaCampoPreco" class="form-text">Exemplo: 10,00 200,00 3890,99</div>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary">Salvar</button>
+
+                </div>
+                
+    </div>
+    
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
+
+<!-- 
+1.fazer um produto aparecer na tabela quando clicar no botão salvar
+dica: elimine ttodas as linhas da tabela antes de comecar
+    crie uma function chamada add product que adicione o produto em um array chamado produtos que acrescente uma linha na tabala
+    o arrey produtos esta fora da tabela
+    
+2. Fazer o paginador funcionar. Considere que o tamanho de cada pagina 
+seja 10 produtos por pagina. Crie a quantidade correta de pagina para o 
+paginador de acordo com a quantiade de elementos que existem na tabela.
+Sempre que boce adicionar um novo produto, voce tera que verificar se ha a necessidade
+de criar uma nova pagina.
