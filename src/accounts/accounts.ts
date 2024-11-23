@@ -1,11 +1,50 @@
 import { Request, RequestHandler, Response } from "express";
 import OracleDB from "oracledb";
 import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
+
 dotenv.config();
 
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Namespace que contém tudo sobre "contas de usuários"
 export namespace AccountsHandler {
+
+
+    export type UserData ={
+        id: number;
+        email: string;
+    };
+
+    async function getUserIdByEmail(email: string): Promise<number | null> {
+        let connection;
+        try {
+            connection = await OracleDB.getConnection({
+                user: process.env.ORACLE_USER,
+                password: process.env.ORACLE_PASSWORD,
+                connectString: process.env.ORACLE_CONN_STR,
+            });
+    
+            const result = await connection.execute(
+                'SELECT ID FROM ACCOUNTS WHERE email = :email',
+                [email]
+            );
+    
+            if (result.rows && result.rows.length > 0) {
+                const user = result.rows[0] as UserData; // Uso do tipo UserData
+                return user.id;
+            } else {
+                return null; // Email não encontrado
+            }
+        } catch (error) {
+            console.error('Erro ao buscar ID do usuário:', error);
+            return null; // Retornar null em caso de erro
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
 
     async function validateCredentials(email: string, password: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
@@ -50,14 +89,24 @@ export namespace AccountsHandler {
 
             if (pEmail && pPassword) {
                 const isLoggedIn = await login(pEmail, pPassword);
-
                 if (isLoggedIn) {
-                    res.status(200).send('Login realizado com sucesso.');
+                    if (!JWT_SECRET) {
+                        res.status(500).json({ message: 'JWT secret is not defined in .env .' });
+                        return;
+                    }
+                    const token = jwt.sign({ email: pEmail }, JWT_SECRET, { expiresIn: '1h' });
+                    const id = await getUserIdByEmail(pEmail);
+
+                    res.status(200).json({
+                        message: 'Login realizado com sucesso.',
+                        token: token,
+                        id: id,
+                    });
                 } else {
-                    res.status(401).send('Credenciais inválidas. Acesso negado.');
+                    res.status(401).json({ message: 'Credenciais inválidas. Acesso negado.' });
                 }
             } else {
-                res.status(400).send('Requisição inválida - Parâmetros faltando.');
+                res.status(400).json({ message: 'Requisição inválida - Parâmetros faltando.' });
             }
         }
 
@@ -94,7 +143,7 @@ export namespace AccountsHandler {
             // Verifica se a data de nascimento tem o formato correto
             const formato = /^\d{4}-\d{2}-\d{2}$/;
             if (!formato.test(pBirthday_date)) {
-                res.status(400).send('Formato da data de nascimento inválido. O formato correto é yyyy-mm-dd.');
+                res.status(400).json({ message: 'Formato da data de nascimento inválido. O formato correto é yyyy-mm-dd.' });
                 await connection.close();
                 return;
             }
@@ -110,7 +159,7 @@ export namespace AccountsHandler {
             const dayDifference = today.getDate() - birthDate.getDate();
 
             if (age < 18 || (age === 18 && (monthDifference < 0 || (monthDifference === 0 && dayDifference < 0)))) {
-                res.status(400).send('Usuário deve ter pelo menos 18 anos.');
+                res.status(400).json({ message: 'Usuário deve ter pelo menos 18 anos.' });
                 await connection.close();
                 return;
             }
@@ -120,18 +169,16 @@ export namespace AccountsHandler {
             );
 
             if (result.rows && result.rows.length > 0) {
-
-                res.status(400).send('Usuário já cadastrado.');
+                res.status(400).json({ message: 'Usuário já cadastrado.' });
             } else {
-
                 await signUp(pName, pEmail, pPassword, pBirthday_date);
-                res.status(200).send('Usuário cadastrado com sucesso.');
+                res.status(200).json({ message: 'Usuário cadastrado com sucesso.' });
             }
 
             await connection.close();
 
         } else {
-            res.status(400).send('Requisição inválida - Parâmetros faltando.');
+            res.status(400).json({ message: 'Requisição inválida - Parâmetros faltando.' });
         }
     };
 }

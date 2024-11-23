@@ -31,16 +31,16 @@ export namespace FinancialManager {
     }
 
     export const getWalletHandler: RequestHandler = async (req: Request, res: Response) => {
-        const pEmail = req.get('email');
+        const userEmail = req.user?.email;
 
-        if (pEmail) {
-            const balance = await getWallet(pEmail);
+        if (userEmail) {
+            const balance = await getWallet(userEmail);
             if (balance) {
                 res.statusCode = 200;
                 res.send(`Saldo da carteira encontrado: R$${balance}`);
             } else {
                 res.statusCode = 400;
-                res.send(`Carteira não encontrada para o email: ${pEmail}`);
+                res.send(`Carteira não encontrada para o email: ${userEmail}`);
             }
         }
     }

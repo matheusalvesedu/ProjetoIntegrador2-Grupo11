@@ -22,11 +22,14 @@ async function performSignIn(event) {
 
         
         if (response.ok) {
-            const data = await response.text();
-            showMessege(data); // Exibe a mensagem de sucesso (opcional)
+            const data = await response.json();
+            const token = data.token;
+            localStorage.setItem("authToken", token);
+            window.location.href = "../index.html";
+
         } else if (response.status === 401) {
-            const data = await response.text();
-            showMessege(data);
+            const data = await response.json();
+            showMessege(data.message);
         }  else {
             showMessege("Erro interno no servidor. Tente novamente mais tarde.");
         }
