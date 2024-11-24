@@ -52,18 +52,18 @@ export namespace EventsHandler {
         const eventDescription = req.get('event_description');
         const eventStartDate = req.get('eventStartDate');
         const eventFinalDate = req.get('eventFinalDate');
-        const pFK_ID = req.get('FK_ACCOUNT_ID');
+        const pFK_ID = req.user?.email;
 
         const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
         if (!eventStartDate || !eventFinalDate || !dateRegex.test(eventStartDate) || !dateRegex.test(eventFinalDate)) {
-            res.status(400).send('Datas devem estar no formato dd/mm/yyyy.');
+            res.status(400).json({ message: 'Datas devem estar no formato dd/mm/yyyy.' });
             return;
         }
         if (eventTitle && eventDescription && eventStartDate && eventFinalDate && pFK_ID) {
             await addNewEvent(eventTitle, eventDescription, eventStartDate, eventFinalDate, parseInt(pFK_ID));
-            res.status(201).send('Evento Criado Com Sucesso. Aguarde a Aprovação.');
+            res.status(201).json({ message: 'Evento Criado Com Sucesso. Aguarde a Aprovação.' });
         } else {
-            res.status(400).send('Parâmetros Faltando.');
+            res.status(400).json({ message: 'Parâmetros Faltando.' });
         }
     };
 
@@ -90,9 +90,9 @@ export namespace EventsHandler {
         if (eventId) {
             const id = parseFloat(eventId);
             await deleteEvent(id);
-            res.status(200).send('Evento Excluído Com Sucesso.');
+            res.status(200).json({message: 'Evento Excluído Com Sucesso.'});
         } else {
-            res.status(400).send('Parâmetros Faltando.');
+            res.status(400).json({message: 'Parâmetros Faltando.'});
         }
     }
 
@@ -153,9 +153,9 @@ export namespace EventsHandler {
         const keyword = req.get('keyword');
         if (keyword) {
             const events = await searchEvents(keyword);
-            res.status(200).send(events);
+            res.status(200).json(events);
         } else {
-            res.status(400).send('Parâmetros Faltando.');
+            res.status(400).json({message: 'Parâmetros Faltando.'});
         }
     };
 
@@ -252,7 +252,7 @@ export namespace EventsHandler {
 
     export const betOnEventsHandler: RequestHandler = async (req: Request, res: Response) => {
         const event_id = req.get('event_id');
-        const pemail = req.get('email');
+        const pemail = req.user?.email;
         const bet_value = req.get('bet_value');
         const bet_option = req.get('bet_option');
 
@@ -264,22 +264,22 @@ export namespace EventsHandler {
                     const walletBalance = await FinancialManager.getWallet(pemail);
                     if (walletBalance) {
                         if (walletBalance < parseFloat(bet_value)) {
-                            res.status(400).send('Saldo Insuficiente .');
+                            res.status(400).json({ message: 'Saldo Insuficiente.' });
                         } else {
                             await betOnEvents(parseInt(event_id), pemail, parseFloat(bet_value), bet_option);
-                            res.status(201).send('Aposta Realizada Com Sucesso.');
+                            res.status(201).json({ message: 'Aposta Realizada Com Sucesso.' });
                         }
                     } else {
-                        res.status(400).send('Saldo não encontrado.');
+                        res.status(400).json({ message: 'Saldo não encontrado.' });
                     }
                 } else {
-                    res.status(404).send('Conta não encontrada.');
+                    res.status(404).json({ message: 'Conta não encontrada.' });
                 }
             } else {
-                res.status(400).send('Valor da Aposta Inválido. Por Favor, insira mais que R$1,00.');
+                res.status(400).json({ message: 'Valor da Aposta Inválido. Por Favor, insira mais que R$1,00.' });
             }
         } else {
-            res.send(400).send('Parâmetros Faltando.');
+            res.status(400).json({ message: 'Parâmetros Faltando.' });
         }
     };
 
@@ -379,14 +379,13 @@ export namespace EventsHandler {
         const event_id = req.get('event_id');
         const event_verdict = req.get('event_verdict');
 
-
         if (event_id && event_verdict) {
             await finishEvent(parseInt(event_id), event_verdict);
             await distributeValues(parseInt(event_id), event_verdict);
 
-            res.status(200).send('Evento Finalizado Com Sucesso.');
+            res.status(200).json({ message: 'Evento Finalizado Com Sucesso.' });
         } else {
-            res.status(400).send('Parâmetros Faltando.');
+            res.status(400).json({ message: 'Parâmetros Faltando.' });
         }
     }
 }
