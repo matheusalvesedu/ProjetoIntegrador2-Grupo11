@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage</title>
+    <!-- Link do Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- CSS Customizado -->
+    <link rel="stylesheet" href="../style/index.css">
+    <script src="../script/index.js" defer></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header d-flex justify-content-between align-items-center">
+        <div class="logo">
+            <img src="../assets/logo.png" alt="Logo" class="logo">
+        </div>
+        <div class="wallet-button"></div>
+            <a href="../pages/wallet.html" class="btn btn-wallet">Minha Carteira</a>
+        </div>
+        <div class="saldo-container">
+            <span>Saldo:  <strong id="wallet">Carregando...</strong></span>
+        </div>
+        <div class="search-bar">
+            <input type="text" class="form-control" placeholder="Pesquisar...">
+        </div>
+    </header>
+
+    <!-- Layout Principal -->
+    <div class="content d-flex">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="text-center mt-3">
+                <a href="../pages/addEvent.html"><button class="btn btn-success">Criar Eventos</button></a>
+            </div>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content flex-fill p-3">
+            <h1 class="text-center">Eventos Disponíveis</h1>
+            <div class="bets-container">
+                <!-- Cards das Apostas -->
+                <!-- Exemplo de um card -->
+                <div class="bet-card">
+                    <h3>Jogo: Flamengo vs Palmeiras</h3>
+                    <p>Data: 25/11/2024</p>
+                    <p>Valor da Aposta: R$ 50,00</p>
+                    <p>Criador: UsuárioX</p>
+                    <div class="text-center mt-3">
+                        <button class="btn btn-primary">Apostar</button>
+                    </div>
+                </div>
+                
+                <!-- Você pode replicar os cards dinamicamente aqui -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Link do Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

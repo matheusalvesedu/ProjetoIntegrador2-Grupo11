@@ -64,6 +64,9 @@ export namespace AccountsHandler {
         return result.rows && result.rows.length > 0;
     }
 
+    //criar uma funcao get_type_user(moderador ou player)
+    
+
     async function login(email: string, password: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 

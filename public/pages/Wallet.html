@@ -12,19 +12,20 @@
         crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../style/wallet.css">
     <script src="../script/wallet.js" defer></script>
+    <script src="../script/index.js" defer></script>
 </head>
 
 <body>
     <header>
         <h1>Minha Carteira</h1>
-        <a href="dashboard.html">Voltar ao Dashboard</a>
+        <a href="../pages/index.html">Voltar ao Home</a>
     </header>
 
     <div class="container">
         <!-- Saldo -->
         <div class="saldo-container">
             <h2>Saldo Atual</h2>
-            <p class="saldo">R$ 0,00</p>
+            <p><span><strong id="wallet">Carregando...</strong></span></p>
             <a href="addFunds.html"><button id="addCreditsBtn">Adicionar Créditos</button></a>
         </div>
 

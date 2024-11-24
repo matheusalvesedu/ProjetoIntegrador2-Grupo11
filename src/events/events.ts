@@ -123,11 +123,13 @@ export namespace EventsHandler {
         if (eventId && eventStatus && textMessage) {
             const id = parseInt(eventId);
             await evaluateEvent(id, eventStatus, textMessage);
-            res.status(200).send(`Evento ${eventStatus}, ${textMessage}`);
+            res.status(200).json({ message: `Evento ${eventStatus}, ${textMessage}` });
         } else {
-            res.status(400).send('Parâmetros Faltando.');
+            res.status(400).json({ message: 'Parâmetros Faltando.' });
         }
     }
+
+
 
     async function searchEvents(keyword: string) {
 
@@ -178,9 +180,9 @@ export namespace EventsHandler {
         const status_event = req.get('status_event');
         if (status_event) {
             const events = await getEvents(status_event);
-            res.status(200).send(events);
+            res.status(200).json(events);
         } else {
-            res.status(400).send('Parâmetros Faltando.');
+            res.status(400).json({ message: 'Parâmetros Faltando.' });
         }
     };
 

@@ -37,7 +37,7 @@ export namespace FinancialManager {
             const balance = await getWallet(userEmail);
             if (balance) {
                 res.statusCode = 200;
-                res.send(`Saldo da carteira encontrado: R$${balance}`);
+                res.send(`R$${balance}`);
             } else {
                 res.statusCode = 400;
                 res.send(`Carteira não encontrada para o email: ${userEmail}`);

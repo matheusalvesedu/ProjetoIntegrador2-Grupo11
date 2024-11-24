@@ -25,7 +25,7 @@ async function performSignIn(event) {
             const data = await response.json();
             const token = data.token;
             localStorage.setItem("authToken", token);
-            window.location.href = "../index.html";
+            window.location.href = "../pages/index.html";
 
         } else if (response.status === 401) {
             const data = await response.json();
