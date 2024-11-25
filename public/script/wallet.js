@@ -95,8 +95,6 @@ function validateBankFields() {
     const agency = document.getElementById('agency').value;
     const account = document.getElementById('account').value;
 
-
-
     if (!bank) {
         showMessage('O banco é obrigatório.');
         return false;
@@ -141,7 +139,7 @@ async function withdrawHandle(event) {
             showMessage(data.message); // Exibe a mensagem de sucesso (opcional)
         } else if (response.status === 400) {
             const data = await response.json();
-            showMessage(data.messa);
+            showMessage(data.message);
         }  else {
             showMessage("Erro interno no servidor. Tente novamente mais tarde.");
         }
@@ -184,7 +182,7 @@ async function handleAddFunds(event) {
 
             const modal = bootstrap.Modal.getInstance(document.getElementById("addFundsModal"));
             modal.hide();
-
+            window.location.reload();
         }
         catch(error){
             console.error('Erro:', error);
@@ -192,9 +190,50 @@ async function handleAddFunds(event) {
         }     
         // Limpa o campo de entrada
         fundsInput.value = "";
+
+
     } else {
         alert("Digite um valor válido!");
     }
 }
 
-window.onload = getWallet;
+async function renderDeposit() {
+    try {
+        const response = await fetch('http://localhost:3001/getDepositTransactions', {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+        });
+
+        const depositData = await response.json();
+
+        // Selecionando o elemento da lista
+        const historyList = document.getElementById('creditPurchaseHistoryList');
+
+        // Limpando a lista antes de adicionar os itens
+        historyList.innerHTML = '';
+
+        // Iterando pelos dados recebidos
+        depositData.forEach(deposit => {
+            // Criando um elemento de lista
+            const listItem = document.createElement('li');
+            listItem.classList.add('list-group-item');
+
+            // Formatando a data e criando o texto do item
+            const transactionDate = new Date(deposit.TRANSACTION_DATE).toLocaleString();
+            listItem.textContent =  `Valor do Deposito: R$${deposit.AMOUNT} Data: ${transactionDate}`;
+
+            // Adicionando o item à lista
+            historyList.appendChild(listItem);
+        });
+    } catch (error) {
+        console.error('Erro ao carregar os dados do histórico:', error);
+    }
+}
+
+// Chamando a função para renderizar os dados
+
+
+window.onload = () => {
+    renderDeposit();
+    getWallet();
+};

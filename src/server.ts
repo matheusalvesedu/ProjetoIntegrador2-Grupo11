@@ -52,6 +52,7 @@ server.use(cors());
 server.use(express.json()); // Middleware para analisar JSON no corpo da requisição
 
 // Rotas protegidas (exemplo)
+routes.get('/getDepositTransactions', authMiddleware, FinancialManager.getDepositTransactionsHandler);
 routes.get('/getWallet', authMiddleware, FinancialManager.getWalletHandler);
 routes.put('/addEvent', authMiddleware, EventsHandler.addNewEventsHandler);
 routes.post('/deleteEvent', authMiddleware, EventsHandler.deleteEventHandler);

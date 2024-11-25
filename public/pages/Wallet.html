@@ -30,23 +30,21 @@
         </div>
     
         <!-- Modal -->
-        <div class="modal fade" id="addFundsModal" tabindex="-1" aria-labelledby="addFundsModalLabel"
-            aria-hidden="true">
+        <div class="modal fade" id="addFundsModal" tabindex="-1" aria-labelledby="addFundsModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <!-- Cabeçalho do modal -->
                     <div class="modal-header">
-                        <h5 class="modal-title" id="addFundsModalLabel">Adicionar Créditos</h5>
+                        <h5 class="modal-title text-black id="addFundsModalLabel">Adicionar Créditos</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-
+    
                     <!-- Corpo do modal -->
                     <div class="modal-body">
                         <form id="addFundsForm" onsubmit="handleAddFunds(event)">
                             <div class="mb-3">
-                                <label for="fundsAmount" class="form-label">Quantia a Adicionar (em reais)</label>
-                                <input type="number" id="fundsAmount" class="form-control"
-                                    placeholder="Digite a quantia" required>
+                                <label for="fundsAmount" class="form-label text-black">Quantia a Adicionar (em reais)</label>
+                                <input type="number" id="fundsAmount" class="form-control" placeholder="Digite a quantia" required>
                             </div>
                             <button type="submit" class="btn btn-success">Adicionar</button>
                         </form>
@@ -54,16 +52,24 @@
                 </div>
             </div>
         </div>
+        <!-- Histórico de Compras de Crédito -->
+        <div class="historico-container" style="max-height: 400px; overflow-y: scroll;">
+            <h2>Histórico de Compras de Crédito</h2>
+            <ul id="creditPurchaseHistoryList" class="list-group">
+                <!-- Os itens do histórico de compras de crédito serão inseridos aqui dinamicamente -->
+            </ul>
 
-
-        <!-- Histórico de Uso de Créditos -->
+        </div>
+    
+        <!-- Histórico de Apostas -->
         <div class="historico-container">
-            <h2>Histórico de Uso de Créditos</h2>
-            <ul id="historicoList" class="list-group">
-                <!-- Os itens do histórico serão inseridos aqui dinamicamente -->
+            <h2>Histórico de Apostas</h2>
+            <ul id="betHistoryList" class="list-group">
+                <!-- Os itens do histórico de apostas serão inseridos aqui dinamicamente -->
             </ul>
         </div>
-
+    
+    
         <div class="sacar-container">
             <h2>Sacar Saldo</h2>
             <form id="withdrawForm" onsubmit="withdrawHandle(event)">
