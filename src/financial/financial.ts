@@ -74,18 +74,18 @@ export namespace FinancialManager {
     }
 
     export const addFundsHandler: RequestHandler = async (req: Request, res: Response) => {
-        const pEmail = req.get('email');
+        const pEmail = req.user?.email;
         const pFunds = req.get('funds');
 
         if (pEmail && pFunds) {
             const funds = parseFloat(pFunds);
             if (funds > 0 && await addFunds(pEmail, funds)) {
-                res.status(200).send(`Depósito concluído com sucesso!`);
+                res.status(200).json({ message: 'Depósito concluído com sucesso!' });
             } else {
-                res.status(400).send('Email incorreto. Não foi possível realizar o depósito');
+                res.status(400).json({ error: 'Email incorreto. Não foi possível realizar o depósito' });
             }
         } else {
-            res.status(400).send('Email ou quantia de depósito não fornecidos');
+            res.status(400).json({ error: 'Email ou quantia de depósito não fornecidos' });
         }
     };
 
@@ -118,7 +118,7 @@ export namespace FinancialManager {
     }
 
     export const withdrawFundsHandler: RequestHandler = async (req: Request, res: Response) => {
-        const pEmail = req.get('email');
+        const pEmail = req.user?.email;
         const pSaque = req.get('saque');
 
         if (pEmail && pSaque) {
@@ -126,37 +126,36 @@ export namespace FinancialManager {
             const balance = await getWallet(pEmail);
             let taxa = 0;
             if (saque <= 100) {
-                taxa = saque * 0.04;
+            taxa = saque * 0.04;
             } else if (saque <= 1000) {
-                taxa = saque * 0.03;
+            taxa = saque * 0.03;
             } else if (saque <= 5000) {
-                taxa = saque * 0.02;
+            taxa = saque * 0.02;
             } else if (saque <= 100000) {
-                taxa = saque * 0.01;
+            taxa = saque * 0.01;
             }
-            
-            
-
             if (balance) {
-                if (saque > balance) {
-                    res.status(400).send('Saldo insuficiente para realizar o saque');
-                }
+            if (saque > balance) {
+                res.status(400).json({ error: 'Saldo insuficiente para realizar o saque' });
+                return;
+            }
             } else {
-                res.status(400).send('Saldo não encontrado para o email: ' + pEmail);
+            res.status(400).json({ error: 'Saldo não encontrado para o email: ' + pEmail });
+            return;
             }
 
             if (saque > 101000) {
-                res.status(400).send('Quantia de saque ecedeu o limite diário');
-            };
+            res.status(400).json({ error: 'Quantia de saque excedeu o limite diário' });
+            return;
+            }
 
             if (saque > 0 && await withdrawFunds(pEmail, saque)) {
-                res.status(200).send(`Saque concluído com sucesso! Valor de saque R$${saque} Valor recebido: R$${saque - taxa} Taxa: R$${taxa}`);
+            res.status(200).json({ message: 'Saque concluído com sucesso!', saque: saque, recebido: saque - taxa, taxa: taxa });
             } else {
-                res.status(400).send('Quantia de saque inválida ou email não encontrado');
+            res.status(400).json({ error: 'Quantia de saque inválida ou email não encontrado' });
             }
-        }
-        else {
-            res.status(400).send('Email ou quantia de saque não fornecidos');
+        } else {
+            res.status(400).json({ error: 'Email ou quantia de saque não fornecidos' });
         }
     }
 }

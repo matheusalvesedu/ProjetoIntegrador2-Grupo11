@@ -35,8 +35,6 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
     try {
         const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
         req.user = decoded; // Adicionar informações do usuário no request
-        console.log(`Usuário autenticado: ${decoded.email}`);
-        console.log(`ID do usuário: ${decoded.id}`);
         next();
 
     } catch (error) {

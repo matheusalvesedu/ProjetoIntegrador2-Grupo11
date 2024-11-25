@@ -26,8 +26,35 @@
         <div class="saldo-container">
             <h2>Saldo Atual</h2>
             <p><span><strong id="wallet">Carregando...</strong></span></p>
-            <a href="addFunds.html"><button id="addCreditsBtn">Adicionar Créditos</button></a>
+            <button id="addCreditsBtn" data-bs-toggle="modal" data-bs-target="#addFundsModal">Adicionar Créditos</button>
         </div>
+    
+        <!-- Modal -->
+        <div class="modal fade" id="addFundsModal" tabindex="-1" aria-labelledby="addFundsModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <!-- Cabeçalho do modal -->
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addFundsModalLabel">Adicionar Créditos</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <!-- Corpo do modal -->
+                    <div class="modal-body">
+                        <form id="addFundsForm" onsubmit="handleAddFunds(event)">
+                            <div class="mb-3">
+                                <label for="fundsAmount" class="form-label">Quantia a Adicionar (em reais)</label>
+                                <input type="number" id="fundsAmount" class="form-control"
+                                    placeholder="Digite a quantia" required>
+                            </div>
+                            <button type="submit" class="btn btn-success">Adicionar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <!-- Histórico de Uso de Créditos -->
         <div class="historico-container">
@@ -37,75 +64,75 @@
             </ul>
         </div>
 
-    <div class="sacar-container">
-        <h2>Sacar Saldo</h2>
-        <form id="withdrawForm" onsubmit="withdrawHandle(event)">
-            <div class="mb-3">
-                <label for="withdrawMethod" class="form-label">Método de Saque</label>
-                <select id="withdrawMethod" class="form-select" onchange="updateWithdrawFields()">
-                    <option value="">Selecione um método</option>
-                    <option value="pix">PIX</option>
-                    <option value="bank">Transferência Bancária</option>
-                </select>
-            </div>
-
-    <!-- Campos específicos de PIX -->
-    <div id="pixFields" class="withdraw-method-fields d-none">
-        <div class="mb-3">
-            <label for="pixKey" class="form-label">Chave PIX</label>
-            <input type="text" id="pixKey" class="form-control" placeholder="Chave PIX">
-        </div>
-    </div>
-    <!-- Campo de email -->
-    <div id="emailField" class="mb-3">
-        <label for="email" class="form-label">Email</label>
-        <input type="email" id="email" class="form-control" placeholder="Digite seu email" required>
-    </div>
-    
-    <!-- Campos específicos de Transferência Bancária -->
-    <div id="bankFields" class="withdraw-method-fields d-none">
-        <div class="mb-3">
-            <label for="bank" class="form-label">Banco</label>
-            <input type="text" id="bank" class="form-control" placeholder="Nome do banco">
-        </div>
-        <div class="mb-3">
-            <label for="agency" class="form-label">Agência / Número da Conta</label>
-            <input type="text" id="agency" class="form-control" placeholder="Agência e Conta Corrente">
-        </div>
-    </div>
-        <!-- Campo de quantia -->
-        <div class="mb-3" style="display: none;" id="amountBox">
-            <label for="amount" class="form-label">Quantia a ser sacada (em reais)</label>
-            <input type="number" id="amount" class="form-control" placeholder="Quantia a ser sacada (em reais)"  required>
-        </div>
-
-        <!-- Botão de saque -->
-        <button type="submit" class="btn btn-primary">Confirmar Saque</button>
-        <!-- Mensagem -->
-        <div id="messageBox" style="display: none; color: rgb(250, 249, 249); margin-top: 10px;">
-            <p id="message"></p>
-        </div>
-
-        <div class="modal" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title">Modal title</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
+        <div class="sacar-container">
+            <h2>Sacar Saldo</h2>
+            <form id="withdrawForm" onsubmit="withdrawHandle(event)">
+                <div class="mb-3">
+                    <label for="withdrawMethod" class="form-label">Método de Saque</label>
+                    <select id="withdrawMethod" class="form-select" onchange="updateWithdrawFields()">
+                        <option value="">Selecione um método</option>
+                        <option value="pix">PIX</option>
+                        <option value="bank">Transferência Bancária</option>
+                    </select>
                 </div>
-                <div class="modal-body">
-                  <p></p>
+
+                <!-- Campos específicos de PIX -->
+                <div id="pixFields" class="withdraw-method-fields d-none">
+                    <div class="mb-3">
+                        <label for="pixKey" class="form-label">Chave PIX</label>
+                        <input type="text" id="pixKey" class="form-control" placeholder="Chave PIX">
+                    </div>
                 </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+                <!-- Campos específicos de Transferência Bancária -->
+                <div id="bankFields" class="withdraw-method-fields d-none">
+                    <div class="mb-3">
+                        <label for="bank" class="form-label">Banco</label>
+                        <input type="text" id="bank" class="form-control" placeholder="Nome do banco">
+                    </div>
+                <div class="mb-3">
+                    <label for="agency" class="form-label">Agência</label>
+                    <input type="text" id="agency" class="form-control" placeholder="Agência">
                 </div>
-              </div>
-            </div>
-          </div>
-        </form>
-    </div>
+                <div class="mb-3">
+                    <label for="account" class="form-label">Numero da Conta</label>
+                    <input type="text" id="account" class="form-control" placeholder="Banco">
+                </div>
+                </div>
+                <!-- Campo de quantia -->
+                <div class="mb-3 d-none" id="amountField">
+                    <label for="amount" class="form-label">Quantia a ser sacada (em reais)</label>
+                    <input type="number" id="amount" class="form-control" placeholder="Quantia a ser sacada (em reais)"
+                        required>
+                </div>
+
+                <!-- Botão de saque -->
+                <button type="submit" class="btn btn-primary">Confirmar Saque</button>
+                <!-- Mensagem -->
+                <div id="messageBox" style="display: none; color: rgb(250, 249, 249); margin-top: 10px;">
+                    <p id="message"></p>
+                </div>
+
+                <div class="modal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Modal title</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p></p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
 </body>
 
 </html>
