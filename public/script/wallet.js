@@ -1,3 +1,34 @@
+function getToken() {
+    return localStorage.getItem("authToken"); // Supondo que o token é armazenado no localStorage
+}
+
+// Função para buscar o saldo da carteira
+async function getWallet() {
+    const token = getToken();
+    if (!token) {
+        alert("Você precisa estar logado!");
+        window.location.href = "../pages/signIn.html";
+        return;
+    }
+
+    try {
+        const response = await fetch("http://localhost:3001/getWallet", {
+            method: "GET",
+            headers: { "Authorization": `Bearer ${token}` },
+        });
+
+        if (response.ok) {
+            const saldo = await response.text();
+            document.getElementById("wallet").textContent = saldo;
+        } else {
+            document.getElementById("wallet").textContent = "Erro ao carregar.";
+        }
+    } catch (error) {
+        console.error(error);
+        document.getElementById("wallet").textContent = "Erro ao carregar.";
+    }
+}
+
 function updateWithdrawFields() {
     const method = document.getElementById('withdrawMethod').value;
     const amountBox = document.getElementById('amountBox');
@@ -165,3 +196,5 @@ async function handleAddFunds(event) {
         alert("Digite um valor válido!");
     }
 }
+
+window.onload = getWallet;
