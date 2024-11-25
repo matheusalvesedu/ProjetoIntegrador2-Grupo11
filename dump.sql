@@ -45,6 +45,7 @@ CREATE TABLE EVENTS
     verdict VARCHAR(3),
     amount_wins DECIMAL,
     amount_loses DECIMAL,
+    category VARCHAR(50),
     FK_ACCOUNT_ID INT,
     FOREIGN KEY (FK_ACCOUNT_ID) REFERENCES ACCOUNTS(ID)
 );
@@ -59,8 +60,9 @@ INSERT INTO EVENTS
     eventStartDate,
     eventFinalDate,
     event_status,
+    category,
     FK_ACCOUNT_ID
-
+    
     )
 VALUES
     (
@@ -70,7 +72,8 @@ VALUES
         '01/01/2021',
         '01/01/2021',
         'Pendente',
-        '1'
+        'Categoria Teste',
+        1
 )
 commit;
 
