@@ -11,6 +11,16 @@
     <script src="../script/evaluateEvents.js" defer></script>
 </head>
 <body>
+    <!-- Header -->
+    <header class="d-flex justify-content-between align-items-center p-3">
+        <img src="../assets/logo.png" alt="Logo" class="logo">
+        <div class="button-container">
+            <a href="../pages/finishEvent.html"><button id="login-btn" class="btn btn-primary me-2">Eventos Ativos</button></a>
+            <a href="../pages/evaluateEvents.html"><button id="signup-btn" class="btn-primary me-2">Pendentes</button></a>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
     <div class="container mt-5">
         <h1 class="text-center">Eventos Pendentes</h1>
         <div id="events-container" class="row mt-4">

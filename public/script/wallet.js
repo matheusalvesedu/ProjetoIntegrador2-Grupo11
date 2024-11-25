@@ -73,7 +73,7 @@ function validateBankFields() {
 async function withdrawHandle(event) {
     event.preventDefault();
 
-    const email = document.getElementById('email').value.trim();
+    const token = localStorage.getItem('authToken');
     const method = document.getElementById('withdrawMethod').value;
     const amount = document.getElementById('amount').value.trim();
 
@@ -85,7 +85,7 @@ async function withdrawHandle(event) {
     try {
         // Configura os cabeçalhos com email e senha
         const reqtHeaders = new Headers();
-        reqtHeaders.append("email", email);
+        reqtHeaders.append("Authorization", `Bearer ${token}`);
         reqtHeaders.append("saque", amount);
 
         // Faz a requisição para o backend

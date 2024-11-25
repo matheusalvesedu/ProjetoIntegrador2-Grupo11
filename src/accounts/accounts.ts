@@ -31,8 +31,8 @@ export namespace AccountsHandler {
             );
     
             if (result.rows && result.rows.length > 0) {
-                const user = result.rows[0] as UserData; // Uso do tipo UserData
-                return user.id;
+                const id = (result.rows[0] as {ID: number}).ID; // Uso do tipo UserData
+                return id;
             } else {
                 return null; // Email não encontrado
             }
@@ -97,8 +97,9 @@ export namespace AccountsHandler {
                         res.status(500).json({ message: 'JWT secret is not defined in .env .' });
                         return;
                     }
-                    const token = jwt.sign({ email: pEmail }, JWT_SECRET, { expiresIn: '1h' });
                     const id = await getUserIdByEmail(pEmail);
+                    const token = jwt.sign({ id: id, email: pEmail  }, JWT_SECRET, { expiresIn: '1h' });
+                    
 
                     res.status(200).json({
                         message: 'Login realizado com sucesso.',

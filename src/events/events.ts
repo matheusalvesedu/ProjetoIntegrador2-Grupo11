@@ -52,20 +52,14 @@ export namespace EventsHandler {
         const eventDescription = req.get('event_description');
         const eventStartDate = req.get('eventStartDate');
         const eventFinalDate = req.get('eventFinalDate');
-        const pFK_ID = req.user?.email;
-
-        const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
-        if (!eventStartDate || !eventFinalDate || !dateRegex.test(eventStartDate) || !dateRegex.test(eventFinalDate)) {
-            res.status(400).json({ message: 'Datas devem estar no formato dd/mm/yyyy.' });
-            return;
-        }
+        const pFK_ID = req.user?.id;
         if (eventTitle && eventDescription && eventStartDate && eventFinalDate && pFK_ID) {
-            await addNewEvent(eventTitle, eventDescription, eventStartDate, eventFinalDate, parseInt(pFK_ID));
+            await addNewEvent(eventTitle, eventDescription, eventStartDate, eventFinalDate, pFK_ID);
             res.status(201).json({ message: 'Evento Criado Com Sucesso. Aguarde a Aprovação.' });
         } else {
             res.status(400).json({ message: 'Parâmetros Faltando.' });
         }
-    };
+        };
 
     async function deleteEvent(eventId: number) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;

@@ -1,23 +1,29 @@
 
-
+async function handle(event) {
+    event.preventDefault();
+    createEvent();
+}
 // Função que será chamada quando o formulário for enviado
 async function createEvent(event) {
-    event.preventDefault(); // Evita o recarregamento da página ao enviar o formulário
+    
 
     const title = document.getElementById('title').value;
     const description = document.getElementById('description').value;
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
-
+    console.log(startDate, endDate);
+    const token = localStorage.getItem('authToken');
+    console.log(token);
     try {
         const h = new Headers();
         h.append('Content-Type', 'application/json');
-        h.append('Authorization', 'Bearer ' + localStorage.getItem('authToken'));
-        h.append('title', title);
-        h.append('description', description);
-        h.append('startDate', startDate);
-        h.append('endDate', endDate);
+        h.append('Authorization', `Bearer ${token}`);
+        h.append('event_title', title);
+        h.append('event_description', description);
+        h.append('eventStartDate', startDate);
+        h.append('eventFinalDate', endDate);
 
+        console.log(h);
         const response = await fetch('http://localhost:3001/addEvent', {
             method: 'PUT',
             headers: h
