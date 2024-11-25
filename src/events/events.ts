@@ -245,7 +245,7 @@ export namespace EventsHandler {
     }
 
     export const betOnEventsHandler: RequestHandler = async (req: Request, res: Response) => {
-        const event_id = req.get('event_id');
+        const event_id = req.get('event_id');   
         const pemail = req.user?.email;
         const bet_value = req.get('bet_value');
         const bet_option = req.get('bet_option');

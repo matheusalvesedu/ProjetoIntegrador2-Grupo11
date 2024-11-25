@@ -22,10 +22,9 @@ async function getEvents() {
     }
 }
 
-// Função para renderizar eventos
 async function renderEvents() {
     const container = document.getElementById("events-container");
-    container.innerHTML = ""; // Limpa o container
+    container.innerHTML = ""; 
 
     const events = await getEvents(); // Busca os eventos aprovados
 
@@ -40,79 +39,86 @@ async function renderEvents() {
 
         eventCard.innerHTML = `
             <div class="card p-3 shadow-sm">
-                <h3>${event.EVENT_TITLE}</h3>
-                <p><strong>Descrição:</strong> ${event.EVENT_DESCRIPTION}</p>
-                <p><strong>Data de Início:</strong> ${event.EVENTSTARTDATE}</p>
-                <p><strong>Data de Fim:</strong> ${event.EVENTFINALDATE}</p>
-                <button class="btn btn-warning evaluate-btn" data-id="${event.EVENT_ID}" data-title="${event.EVENT_TITLE}">
-                    Apostar
-                </button>
+            <h3>${event.EVENT_TITLE}</h3>
+            <p><strong>Descrição:</strong> ${event.EVENT_DESCRIPTION}</p>
+            <p><strong>Data de Início:</strong> ${event.EVENTSTARTDATE}</p>
+            <p><strong>Data de Fim:</strong> ${event.EVENTFINALDATE}</p>
+            <button class="btn-warning bet-btn" data-id="${event.EVENT_ID}" data-title="${event.EVENT_TITLE}">
+                Apostar
+            </button>
+            <p style="font-size: 10px;"> Código do evento: ${event.EVENT_ID}</p>
             </div>
         `;
-
         container.appendChild(eventCard);
-    });
+        });
 
-    // Adiciona os eventos de clique para abrir o modal
-    document.querySelectorAll(".evaluate-btn").forEach((button) => {
+        // Adiciona os eventos de clique para abrir o modal de aposta
+        document.querySelectorAll(".bet-btn").forEach((button) => {
         button.addEventListener("click", (e) => {
             const eventId = e.target.getAttribute("data-id");
             const eventTitle = e.target.getAttribute("data-title");
 
-            // Atualiza o modal com os detalhes do evento
-            document.getElementById("evaluationModalLabel").textContent = `Avaliação do Evento: ${eventTitle}`;
-            document.getElementById("evaluationComment").value = "";
+            document.getElementById("eventName").value = eventTitle;
+            document.getElementById("betForm").dataset.eventId = eventId;
 
-            // Mostra o modal
-            const modal = new bootstrap.Modal(document.getElementById("evaluationModal"));
+            const modal = new bootstrap.Modal(document.getElementById("betModal"));
             modal.show();
-
-            // Configura os botões do modal
-            const approveButton = document.getElementById("approveButton");
-            const rejectButton = document.getElementById("rejectButton");
-
-            approveButton.onclick = () => handleEvaluation(eventId, "Aprovado", modal);
-            rejectButton.onclick = () => handleEvaluation(eventId, "Rejeitado", modal);
         });
-    });
+        });
 }
 
-// Função para avaliar eventos
-async function handleEvaluation(eventId, status, modal) {
-    const comment = document.getElementById("evaluationComment").value.trim();
+// Função para lidar com a submissão da aposta
+async function handleBetSubmission(event) {
+    event.preventDefault();
 
-    if (!comment) {
-        alert("Por favor, adicione um comentário antes de enviar a avaliação.");
+    const betForm = document.getElementById("betForm");
+    const eventId = betForm.dataset.eventId;
+    const betOption = document.querySelector("input[name='betOption']:checked")?.value;
+    const betAmount = document.getElementById("betAmount").value;
+
+    if (!betOption) {
+        alert("Por favor, selecione uma opção de aposta.");
         return;
     }
 
+    if (!betAmount || betAmount <= 0) {
+        alert("Por favor, insira um valor válido para a aposta.");
+        return;
+    }
+
+    const h = new Headers();
+    h.append("Content-Type", "application/json");
+    h.append("Authorization", `Bearer ${localStorage.getItem("authToken")}`);  
+    h.append("event_id", eventId);
+    h.append("bet_option", betOption);
+    h.append("bet_value", betAmount);
+
+
     try {
-        const response = await fetch("http://localhost:3001/evaluateEvent", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                event_id: eventId,
-                event_status: status,
-                message: comment,
-            }),
+        const response = await fetch("http://localhost:3001/betOnEvent", {
+            method: "PUT",
+            headers: h,
         });
 
         if (!response.ok) {
-            throw new Error("Erro ao enviar avaliação.");
+            throw new Error("Erro ao enviar a aposta.");
         }
 
-        alert(`Evento avaliado como '${status}' com sucesso!`);
+        alert("Aposta realizada com sucesso!");
+
+        // Fecha o modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById("betModal"));
         modal.hide();
-        renderEvents(); // Atualiza os eventos
     } catch (error) {
-        console.error("Erro ao avaliar o evento:", error);
-        alert("Erro ao enviar a avaliação. Tente novamente.");
+        console.error("Erro ao enviar a aposta:", error);
+        alert("Erro ao realizar a aposta. Tente novamente.");
     }
 }
 
-// Inicializa a página
+// Adiciona o evento de submissão ao formulário de aposta
 document.addEventListener("DOMContentLoaded", () => {
     renderEvents();
+
+    const betForm = document.getElementById("betForm");
+    betForm.addEventListener("submit", handleBetSubmission);
 });
