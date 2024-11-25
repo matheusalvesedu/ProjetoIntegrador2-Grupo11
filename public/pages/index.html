@@ -23,6 +23,7 @@
             <span>Saldo: <strong id="wallet">Carregando...</strong></span>
         </div>
         <a href="../pages/wallet.html" class="btn btn-wallet">Minha Carteira</a>
+        
     </header>
 
     <!-- Main Layout -->
@@ -32,16 +33,35 @@
             <div class="text-center">
                 <a href="../pages/addEvent.html"><button class="btn btn-success">Criar Eventos</button></a>
             </div>
+            <div class="categories mt-4 d-flex flex-column align-items-center">
+                <h5>Categorias</h5>
+                <div class="btn-group-vertical"></div>
+                    <li class="list-group-item"><a href="#" class="category-link" data-category="futebol">Futebol</a></li>
+                    <li class="list-group-item"><a href="#" class="category-link" data-category="basquete">Basquete</a></li>
+                    <li class="list-group-item"><a href="#" class="category-link" data-category="politica">Política</a></li>
+                </ul>
+            </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content flex-fill p-3">
+            <div class="input-group" role="search">
+                <input class="form-control me-2" type="text" placeholder="Pesquisar eventos" aria-label="Search">
+                <button class="btn btn-outline-success" type="button"><i class="fas fa-search"></i>Pesquisar</button>
+            </div>
+                <!-- Filter Container -->
+            <div class="filter-container d-flex justify-content-center mt-4">
+                <button class="btn btn-outline-primary me-2" id="mostBetEvents">Eventos Mais Apostados</button>
+                <button class="btn btn-outline-primary" id="expiringEvents">Eventos Próximos de Expirar</button>
+            </div>
             <h1 class="text-center">Eventos Disponíveis</h1>
             <div id="events-container" class="row mt-4">
                 <!-- Eventos serão carregados dinamicamente -->
             </div>
         </main>
     </div>
+
+
 
     <div class="modal fade" id="betModal" tabindex="-1" aria-labelledby="betModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered"> <!-- Centraliza o modal -->

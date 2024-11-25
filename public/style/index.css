@@ -1,5 +1,5 @@
 :root {
-    --color-primary: #181419; /* Fundo da página */
+    --color-primary: #360517; /* Fundo da página */
     --color-secondary: #9e0b41; /* Fundo do header e sidebar */
     --color-tertiary: #FFFCF5; /* Texto */
     --color-quaternary: #cc3e18; /* Destaque secundário */
@@ -42,7 +42,7 @@ body {
     background-color: #820935;
     padding: 1rem;
     color: var(--color-tertiary);
-    height: 100vh;
+    flex: 20%;
 }
 
 .sidebar h2 {
@@ -153,6 +153,7 @@ body {
     background-color: var(--color-quaternary);
     transform: translateY(-3px);
 }
+
 .card {
     background-color: var(--color-secondary);
     border: 1px solid var(--color-quaternary);
@@ -188,4 +189,102 @@ body {
 .card .btn-warning:hover {
     background-color: var(--color-quaternary);
     transform: translateY(-3px);
+}
+
+.input-group {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.input-group .form-control {
+    padding: 0.5rem;
+    border: 1px solid var(--color-quaternary);
+    border-radius: 5px 0 0 5px;
+    transition: border-color 0.3s ease;
+    width: 500px;
+}
+
+.input-group .form-control:focus {
+    border-color: var(--color-quinary);
+    outline: none;
+}
+
+.input-group .btn-outline-success {
+    background-color: var(--color-quinary);
+    color: var(--color-tertiary);
+    border: 1px solid var(--color-quinary);
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    padding: 0.5rem 1rem;
+}
+
+.input-group .btn-outline-success:hover {
+    background-color: var(--color-quaternary);
+    transform: translateY(-3px);
+}
+
+.filter-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.filter-container .btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--color-quaternary);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    margin-right: 0.5rem;
+}
+
+.filter-container .btn:last-child {
+    margin-right: 0;
+}
+
+.filter-container .btn-outline-primary {
+    background-color: var(--color-secondary);
+    color: var(--color-tertiary);
+}
+
+.filter-container .btn-outline-primary:hover {
+    background-color: var(--color-quaternary);
+    color: var(--color-tertiary);
+    transform: translateY(-3px);
+}
+
+
+.categories {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.categories h5 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-quinary);
+}
+
+.categories .list-group {
+    width: 100%;
+    max-width: 300px;
+}
+
+.categories .list-group-item {
+    background-color: #820935;
+    color: var(--color-tertiary);
+    margin-bottom: 0.8rem; /* Espaçamento entre os itens */
+    padding: 0.5rem 1rem; /* Espaçamento interno para melhorar o layout */
+    border-radius: 5px; /* Opcional: para deixar os itens mais visuais */
+}
+
+
+.categories .category-link {
+    color: var(--color-tertiary);
+    text-decoration: none;
 }
