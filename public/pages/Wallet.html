@@ -44,7 +44,7 @@
                         <form id="addFundsForm" onsubmit="handleAddFunds(event)">
                             <div class="mb-3">
                                 <label for="fundsAmount" class="form-label text-black">Quantia a Adicionar (em reais)</label>
-                                <input type="number" id="fundsAmount" class="form-control" placeholder="Digite a quantia" required>
+                                <input type="number" id="fundsAmount" class="form-control" step="0.01" placeholder="Digite a quantia" required>
                             </div>
                             <button type="submit" class="btn btn-success">Adicionar</button>
                         </form>
@@ -58,7 +58,6 @@
             <ul id="creditPurchaseHistoryList" class="list-group">
                 <!-- Os itens do histórico de compras de crédito serão inseridos aqui dinamicamente -->
             </ul>
-
         </div>
     
         <!-- Histórico de Apostas -->

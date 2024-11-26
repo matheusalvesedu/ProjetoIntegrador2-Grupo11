@@ -25,11 +25,11 @@ async function performSignUp(event) {
         });
 
         if (response.ok) {
-            const data = await response.text();
-            showMessage(data);
+            const data = await response.json();
+            showMessage(data.message);
         } else if (response.status === 400) {
-            const data = await response.text();
-            showMessage(data);
+            const data = await response.json();
+            showMessage(data.message);
         } else {
             showMessage("Erro interno no servidor. Tente novamente mais tarde.");
         }

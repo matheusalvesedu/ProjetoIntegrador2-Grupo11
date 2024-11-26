@@ -9,7 +9,7 @@ CREATE TABLE ACCOUNTS
     password VARCHAR(255) NOT NULL,
     birthday_date VARCHAR(10) NOT NULL,
     user_type VARCHAR(9),
-    balance DECIMAL,
+    balance DECIMAL(10,2),
     token VARCHAR2(10)
 );
 
@@ -41,7 +41,7 @@ CREATE TABLE TRANSACTIONS (
     transaction_id INT PRIMARY KEY,   
     FK_ACCOUNT_ID INT NOT NULL,             
     transaction_type VARCHAR(10) NOT NULL,
-    amount DECIMAL NOT NULL,            
+    amount DECIMAL(10,2) NOT NULL,            
     transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
     FOREIGN KEY (FK_ACCOUNT_ID) REFERENCES ACCOUNTS(id)
 );
@@ -64,8 +64,8 @@ CREATE TABLE EVENTS
     eventFinalDate VARCHAR(10),
     event_status VARCHAR(20),
     verdict VARCHAR(3),
-    amount_wins DECIMAL,
-    amount_loses DECIMAL,
+    amount_wins DECIMAL(10,2),
+    amount_loses DECIMAL(10,2),
     category VARCHAR(50),
     FK_ACCOUNT_ID INT,
     FOREIGN KEY (FK_ACCOUNT_ID) REFERENCES ACCOUNTS(ID)
@@ -105,7 +105,7 @@ CREATE SEQUENCE SEQ_BETS START WITH 1 INCREMENT BY 1;
 CREATE TABLE BETS
 (
     bet_id INT PRIMARY KEY,
-    bet_value DECIMAL ,
+    bet_value DECIMAL(10,2) ,
     bet_option VARCHAR(10) NOT NULL,
     FK_ACCOUNT_EMAIL VARCHAR2(100) NOT NULL,
     FK_EVENT_ID INT NOT NULL,

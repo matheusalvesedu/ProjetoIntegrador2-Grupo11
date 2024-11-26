@@ -90,7 +90,32 @@ export namespace EventsHandler {
         }
     }
 
-    async function evaluateEvent(eventId: number, event_status: string, desc: string) {
+
+    async function validateEvent(eventId: number) {
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        let connection = await OracleDB.getConnection({
+            user: process.env.ORACLE_USER,
+            password: process.env.ORACLE_PASSWORD,
+            connectString: process.env.ORACLE_CONN_STR
+        });
+
+        let result = await connection.execute(
+            `SELECT * FROM EVENTS WHERE event_id = :eventId`,
+            [eventId]
+        );
+
+        if (result.rows && result.rows.length > 0) {
+            await connection.close();
+            return true;
+        } else {
+            await connection.close();
+            return false;
+        }
+      
+    }
+
+    async function evaluateEvent(eventId: number, event_status: string, category: string)  {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         const connection = await OracleDB.getConnection({
@@ -105,18 +130,32 @@ export namespace EventsHandler {
             { autoCommit: true }
         );
 
+        await connection.execute(
+            'UPDATE EVENTS SET category = :category WHERE event_id = :eventId',
+            [category, eventId],
+            { autoCommit: true }
+        );
+        
 
-        await connection.close();
+
+
+        return;
     }
 
     export const evaluateEventHandler: RequestHandler = async (req: Request, res: Response) => {
         const eventId = req.get('event_id');
         const eventStatus = req.get('event_status');
         const textMessage = req.get('message');
+        const category = req.get('category');
 
-        if (eventId && eventStatus && textMessage) {
+        if (eventId && eventStatus && textMessage && category) {
             const id = parseInt(eventId);
-            await evaluateEvent(id, eventStatus, textMessage);
+            const validacao = await validateEvent(id);
+            if  (!validacao) {
+                res.status(404).json({ message: 'Evento não encontrado.' });
+                return;
+            }
+            await evaluateEvent(id, eventStatus, category);
             res.status(200).json({ message: `Evento ${eventStatus}, ${textMessage}` });
         } else {
             res.status(400).json({ message: 'Parâmetros Faltando.' });

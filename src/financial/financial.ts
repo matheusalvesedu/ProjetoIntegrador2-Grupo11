@@ -69,7 +69,7 @@ export namespace FinancialManager {
         }
     }
 
-    async function createAddFundsTransaction(ownerEmail: string, funds: number) {
+    async function createTransaction(ownerEmail: string, funds: number, transactionType: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         let connection = await OracleDB.getConnection({
@@ -85,8 +85,8 @@ export namespace FinancialManager {
                 `INSERT INTO TRANSACTIONS
                 (transaction_id, FK_ACCOUNT_ID, transaction_type, amount)
                 VALUES
-                (SEQ_ACCOUNTS.NEXTVAL, :accountId, 'DEPOSIT', :funds)`,
-                { accountId, funds },
+                (SEQ_ACCOUNTS.NEXTVAL, :accountId, :transactionType, :funds)`,
+                { accountId, transactionType ,funds },
                 { autoCommit: true }
             );
             await connection.close();
@@ -129,11 +129,13 @@ export namespace FinancialManager {
     export const addFundsHandler: RequestHandler = async (req: Request, res: Response) => {
         const pEmail = req.user?.email;
         const pFunds = req.get('funds');
+        const transaction_type = req.get('transactionType');
 
-        if (pEmail && pFunds) {
+        if (pEmail && pFunds && transaction_type) {
             const funds = parseFloat(pFunds);
+            console.log(funds);
             if (funds > 0 && await addFunds(pEmail, funds)) {
-                await createAddFundsTransaction(pEmail, funds);
+                await createTransaction(pEmail, funds, transaction_type);
                 res.status(200).json({ message: 'Depósito concluído com sucesso!' });
             } else {
                 res.status(400).json({ error: 'Email incorreto. Não foi possível realizar o depósito' });
@@ -143,7 +145,9 @@ export namespace FinancialManager {
         }
     };
 
-    async function getDepositTransactions(ownerEmail: string) {
+    
+
+    async function getTransactions(ownerEmail: string, transactionType: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         let connection = await OracleDB.getConnection({
@@ -156,8 +160,8 @@ export namespace FinancialManager {
 
         if (accountId) {
             const result = await connection.execute(
-                `SELECT * FROM transactions WHERE FK_ACCOUNT_ID = :accountId AND transaction_type = 'DEPOSIT'`,
-                [accountId]
+                `SELECT * FROM transactions WHERE FK_ACCOUNT_ID = :accountId AND transaction_type = :transactionType ORDER BY transaction_date DESC`,
+                [accountId, transactionType]
             );
             await connection.close();
             return result.rows;
@@ -167,14 +171,14 @@ export namespace FinancialManager {
         }
     }
 
-    export const getDepositTransactionsHandler: RequestHandler = async (req: Request, res: Response) => {
+    export const getTransactionsHandler: RequestHandler = async (req: Request, res: Response) => {
         const pEmail = req.user?.email;
-        console.log(pEmail);
-        if (pEmail) {
-            const transactions = await getDepositTransactions(pEmail);
+        const transactionType = req.get('transactionType');
+
+        if(pEmail && transactionType) {
+            const transactions = await getTransactions(pEmail, transactionType);
             if (transactions) {
                 res.status(200).json(transactions);
-
             } else {
                 res.status(400).json({ error: 'Email Invalido, não foi possível encontrar as transações' });
             }
@@ -212,11 +216,12 @@ export namespace FinancialManager {
     export const withdrawFundsHandler: RequestHandler = async (req: Request, res: Response) => {
         const pEmail = req.user?.email;
         const pSaque = req.get('saque');
+        const transaction_type = req.get('transactionType');
 
-        if (pEmail && pSaque) {
+        if (pEmail && pSaque && transaction_type) {
             var saque = parseFloat(pSaque);
-            const balance = await getWallet(pEmail);
             let taxa = 0;
+
             if (saque <= 100) {
             taxa = saque * 0.04;
             } else if (saque <= 1000) {
@@ -226,6 +231,9 @@ export namespace FinancialManager {
             } else if (saque <= 100000) {
             taxa = saque * 0.01;
             }
+
+            const balance = await getWallet(pEmail);
+
             if (balance) {
             if (saque > balance) {
                 res.status(400).json({ error: 'Saldo insuficiente para realizar o saque' });
@@ -242,12 +250,17 @@ export namespace FinancialManager {
             }
 
             if (saque > 0 && await withdrawFunds(pEmail, saque)) {
-            res.status(200).json({ message: 'Saque concluído com sucesso!', saque: saque, recebido: saque - taxa, taxa: taxa });
+                const transaction = await createTransaction(pEmail, saque, transaction_type);
+                if (transaction){
+                    res.status(200).json({ message: 'Saque concluído com sucesso!', saque: saque, recebido: saque - taxa, taxa: taxa });
+                } else {
+                    res.status(400).json({ error: 'Erro ao criar transação de saque' });
+                }
             } else {
             res.status(400).json({ error: 'Quantia de saque inválida ou email não encontrado' });
             }
         } else {
             res.status(400).json({ error: 'Email ou quantia de saque não fornecidos' });
+            }
         }
     }
-}

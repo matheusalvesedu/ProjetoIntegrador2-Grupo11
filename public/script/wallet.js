@@ -127,6 +127,7 @@ async function withdrawHandle(event) {
         const reqtHeaders = new Headers();
         reqtHeaders.append("Authorization", `Bearer ${token}`);
         reqtHeaders.append("saque", amount);
+        reqtHeaders.append("transactionType", 'WITHDRAW');
 
         // Faz a requisição para o backend
         const response = await fetch("http://localhost:3001/withdrawFunds", {
@@ -154,8 +155,8 @@ async function withdrawHandle(event) {
 async function handleAddFunds(event) {
     event.preventDefault();
 
-    const fundsInput = document.getElementById("fundsAmount");
-    const amount = parseFloat(fundsInput.value);
+    const amount = document.getElementById("fundsAmount").value;
+   console.log(amount);
 
     if (!isNaN(amount) && amount > 0) {
         // Simula a adição de créditos (você pode fazer uma chamada para o backend aqui)
@@ -164,6 +165,7 @@ async function handleAddFunds(event) {
             const h = new Headers();
             h.append('Authorization', `Bearer ${localStorage.getItem('authToken')}`);
             h.append('funds', amount);
+            h.append('transactionType','DEPOSIT');
             const response = await fetch('http://localhost:3001/addFunds', {
                 method: 'POST',
                 headers: h
@@ -199,9 +201,15 @@ async function handleAddFunds(event) {
 
 async function renderDeposit() {
     try {
-        const response = await fetch('http://localhost:3001/getDepositTransactions', {
+        const h = new Headers();
+        h.append('Authorization', `Bearer ${localStorage.getItem('authToken')}`);
+        h.append('transactionType', 'DEPOSIT');
+
+        console.log(h);
+
+        const response = await fetch('http://localhost:3001/getTransactions', {
             method: 'GET',
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+            headers: h,
         });
 
         const depositData = await response.json();
@@ -218,9 +226,24 @@ async function renderDeposit() {
             const listItem = document.createElement('li');
             listItem.classList.add('list-group-item');
 
-            // Formatando a data e criando o texto do item
-            const transactionDate = new Date(deposit.TRANSACTION_DATE).toLocaleString();
-            listItem.textContent =  `Valor do Deposito: R$${deposit.AMOUNT} Data: ${transactionDate}`;
+            // Criando elementos para exibição detalhada
+            const amountElement = document.createElement('strong');
+            amountElement.textContent = `💰 Valor do Depósito: R$${deposit.AMOUNT.toFixed(2)}`;
+            amountElement.style.color = '#28a745';
+
+            const dateElement = document.createElement('span');
+            const transactionDate = new Date(deposit.TRANSACTION_DATE).toLocaleString('pt-BR', {
+                dateStyle: 'short',
+                timeStyle: 'short'
+            });
+            dateElement.textContent = `📅 Data: ${transactionDate}`;
+            dateElement.style.display = 'block';
+            dateElement.style.marginTop = '5px';
+            dateElement.style.color = '#6c757d';
+
+            // Adicionando os elementos ao listItem
+            listItem.appendChild(amountElement);
+            listItem.appendChild(dateElement);
 
             // Adicionando o item à lista
             historyList.appendChild(listItem);
@@ -229,8 +252,6 @@ async function renderDeposit() {
         console.error('Erro ao carregar os dados do histórico:', error);
     }
 }
-
-// Chamando a função para renderizar os dados
 
 
 window.onload = () => {
