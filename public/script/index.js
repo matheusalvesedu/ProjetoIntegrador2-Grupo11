@@ -22,51 +22,74 @@ async function getEvents() {
     }
 }
 
-async function renderEvents() {
+async function renderEvents(action) {
+     
     const container = document.getElementById("events-container");
     container.innerHTML = ""; 
 
-    const events = await getEvents(); // Busca os eventos aprovados
+    let events = [];
+    try {
+        // Decide a fonte dos eventos com base no parâmetro `action`
+        if (action === "Aprovado") {
+            events = await getEvents(); // Busca eventos aprovados
+        } else if (action === "search") {
+            const keyword = document.getElementById("searchInput").value.trim();
+            if (!keyword) {
+                alert("Digite uma palavra-chave para buscar.");
+                return;
+            }
+            events = await searchEvents(keyword); // Busca eventos pelo termo
+        } else {
+            throw new Error("Ação inválida para renderização de eventos.");
+        }
 
-    if (events.length === 0) {
-        container.innerHTML = "<p class='text-center'>Nenhum evento aprovado disponível.</p>";
-        return;
-    }
+        // Verifica se há eventos retornados
+        if (events.length === 0) {
+            container.innerHTML = `<p class='text-center'>${action === "approved" ? "Nenhum evento aprovado disponível." : "Nenhum evento encontrado para a busca."}</p>`;
+            return;
+        }
 
-    events.forEach((event) => {
-        const eventCard = document.createElement("div");
-        eventCard.className = "col-md-4 mb-4";
+        // Renderiza os cartões de eventos
+        events.forEach((event) => {
+            const eventCard = document.createElement("div");
+            eventCard.className = "col-md-4 mb-4";
 
-        eventCard.innerHTML = `
-            <div class="card p-3 shadow-sm">
-            <h3>${event.EVENT_TITLE}</h3>
-            <p><strong>Descrição:</strong> ${event.EVENT_DESCRIPTION}</p>
-            <p><strong>Data de Início:</strong> ${event.EVENTSTARTDATE}</p>
-            <p><strong>Data de Fim:</strong> ${event.EVENTFINALDATE}</p>
-            <p><strong>Categoria:</strong> ${event.CATEGORY}</p>
-            <button class="btn-warning bet-btn" data-id="${event.EVENT_ID}" data-title="${event.EVENT_TITLE}">
-                Apostar
-            </button>
-            <p style="font-size: 10px;"> Código do evento: ${event.EVENT_ID}</p>
-            </div>
-        `;
-        container.appendChild(eventCard);
+            eventCard.innerHTML = `
+                <div class="card p-3 shadow-sm">
+                    <h3>${event.EVENT_TITLE}</h3>
+                    <p><strong>Descrição:</strong> ${event.EVENT_DESCRIPTION}</p>
+                    <p><strong>Data de Início:</strong> ${event.EVENTSTARTDATE}</p>
+                    <p><strong>Data de Fim:</strong> ${event.EVENTFINALDATE}</p>
+                    <p><strong>Data do evento:</strong> ${event.EVENTDATE}</p>
+                    <p><strong>Categoria:</strong> ${event.CATEGORY}</p>
+                    <button class="btn-warning bet-btn" data-id="${event.EVENT_ID}" data-title="${event.EVENT_TITLE}">
+                        Apostar
+                    </button>
+                    <p style="font-size: 10px;">Código do evento: ${event.EVENT_ID}</p>
+                </div>
+            `;
+            container.appendChild(eventCard);
         });
 
         // Adiciona os eventos de clique para abrir o modal de aposta
         document.querySelectorAll(".bet-btn").forEach((button) => {
-        button.addEventListener("click", (e) => {
-            const eventId = e.target.getAttribute("data-id");
-            const eventTitle = e.target.getAttribute("data-title");
+            button.addEventListener("click", (e) => {
+                const eventId = e.target.getAttribute("data-id");
+                const eventTitle = e.target.getAttribute("data-title");
 
-            document.getElementById("eventName").value = eventTitle;
-            document.getElementById("betForm").dataset.eventId = eventId;
+                document.getElementById("eventName").value = eventTitle;
+                document.getElementById("betForm").dataset.eventId = eventId;
 
-            const modal = new bootstrap.Modal(document.getElementById("betModal"));
-            modal.show();
+                const modal = new bootstrap.Modal(document.getElementById("betModal"));
+                modal.show();
+            });
         });
-        });
+    } catch (error) {
+        console.error("Erro na renderização dos eventos:", error);
+        container.innerHTML = `<p class='text-center'>Erro ao carregar eventos.</p>`;
+    }
 }
+
 
 // Função para lidar com a submissão da aposta
 async function handleBetSubmission(event) {
@@ -118,10 +141,45 @@ async function handleBetSubmission(event) {
     }
 }
 
-// Adiciona o evento de submissão ao formulário de aposta
-document.addEventListener("DOMContentLoaded", () => {
-    renderEvents();
 
+document.addEventListener("DOMContentLoaded", () => {
+    renderEvents("Aprovado");
+
+    // Evento para submissão do formulário de aposta
     const betForm = document.getElementById("betForm");
     betForm.addEventListener("submit", handleBetSubmission);
+
+    // Evento para o botão de pesquisa
+    const searchButton = document.getElementById("searchButton");
+    searchButton.addEventListener("click", () => renderEvents("search"));
 });
+
+async function searchEvents() {
+
+    const keyword = document.getElementById("searchInput").value;
+    const eventStatus = "Aprovado";
+
+    h = new Headers();
+    h.append("Authorization", `Bearer ${localStorage.getItem("authToken")}`);
+    h.append("event_status",eventStatus);
+    h.append("keyword", keyword);
+
+    console.log(keyword);
+
+    try {
+        const response = await fetch("http://localhost:3001/searchEvents", {
+            method: "GET",
+            headers: h,
+        });
+
+        if (!response.ok) {
+            throw new Error("Erro ao carregar eventos.");
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Erro na busca dos eventos:", error);
+        return [];
+    }
+}

@@ -173,7 +173,7 @@ export namespace EventsHandler {
         });
 
         let result = await connection.execute(
-            `SELECT * FROM EVENTS WHERE event_title LIKE '%${keyword}%' OR event_description LIKE '%${keyword}%'`
+            `SELECT * FROM EVENTS WHERE event_title LIKE '%${keyword}%' OR event_description LIKE '%${keyword}% OR category LIKE '%${keyword}%'`
         );
 
         await connection.close();
