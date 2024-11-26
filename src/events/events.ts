@@ -8,7 +8,7 @@ dotenv.config();
 
 export namespace EventsHandler {
 
-    async function addNewEvent(eventTitle: string, eventDescription: string, eventStart: string, eventFinal: string, FK_ACCOUNT_ID: number) {
+    async function addNewEvent(eventTitle: string, eventDescription: string, eventStart: string, eventFinal: string, FK_ACCOUNT_ID: number, eventDate: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         let connection = await OracleDB.getConnection({
@@ -25,7 +25,8 @@ export namespace EventsHandler {
             eventStartDate,
             eventFinalDate,
             event_status,
-            FK_ACCOUNT_ID
+            FK_ACCOUNT_ID,
+            eventDate
             ) VALUES (
             SEQ_EVENTS.NEXTVAL,
             :eventTitle,
@@ -33,14 +34,16 @@ export namespace EventsHandler {
             :eventStart,
             :eventFinal,
             'pendente',
-            :FK_ACCOUNT_ID
+            :FK_ACCOUNT_ID,
+            :eventDate
             )`,
             {
                 eventTitle: eventTitle,
                 eventDescription: eventDescription,
                 eventStart: eventStart,
                 eventFinal: eventFinal,
-                FK_ACCOUNT_ID: FK_ACCOUNT_ID
+                FK_ACCOUNT_ID: FK_ACCOUNT_ID,
+                eventDate: eventDate
             }
         );
 
@@ -53,9 +56,10 @@ export namespace EventsHandler {
         const eventDescription = req.get('event_description');
         const eventStartDate = req.get('eventStartDate');
         const eventFinalDate = req.get('eventFinalDate');
+        const eventDate = req.get('eventDate');
         const pFK_ID = req.user?.id;
-        if (eventTitle && eventDescription && eventStartDate && eventFinalDate && pFK_ID) {
-            await addNewEvent(eventTitle, eventDescription, eventStartDate, eventFinalDate, pFK_ID);
+        if (eventTitle && eventDescription && eventStartDate && eventFinalDate && pFK_ID && eventDate) {
+            await addNewEvent(eventTitle, eventDescription, eventStartDate, eventFinalDate, pFK_ID, eventDate);
             res.status(201).json({ message: 'Evento Criado Com Sucesso. Aguarde a Aprovação.' });
         } else {
             res.status(400).json({ message: 'Parâmetros Faltando.' });

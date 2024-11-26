@@ -12,6 +12,7 @@ async function createEvent(event) {
     const description = document.getElementById('description').value;
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
+    const Date = document.getElementById('Date').value;
     console.log(startDate, endDate);
     const token = localStorage.getItem('authToken');
     console.log(token);
@@ -23,6 +24,7 @@ async function createEvent(event) {
         h.append('event_description', description);
         h.append('eventStartDate', startDate);
         h.append('eventFinalDate', endDate);
+        h.append('eventDate', Date);
         
         console.log(h);
         const response = await fetch('http://localhost:3001/addEvent', {
