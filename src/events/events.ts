@@ -2,8 +2,6 @@ import { Request, RequestHandler, Response } from "express";
 import { FinancialManager } from "../financial/financial";
 import OracleDB from "oracledb";
 import dotenv from 'dotenv';
-import { Console } from "console";
-
 dotenv.config();
 
 export namespace EventsHandler {
@@ -410,7 +408,6 @@ export namespace EventsHandler {
             { event_id, lowerCaseVerdict }
         );
 
-        console.log(result.rows);
 
         if (result.rows && result.rows.length > 0) {
             // Calcular o prêmio para cada vencedor
@@ -430,14 +427,11 @@ export namespace EventsHandler {
                     if (typeof row === 'object' && row !== null) {
                         let betValue = (row as any).BET_VALUE; // Valor da aposta de cada vencedor
                         let email = (row as any).FK_ACCOUNT_EMAIL; // Email do usuário vencedor
-                        console.log(betValue);
-                        console.log(amount_wins);
-                        console.log(betValue / amount_wins);
+                 
                         // Calcular a proporção e o prêmio individual
                         var proportion = betValue / amount_wins;
                         const prize = amount_loses * proportion;
-                        console.log(prize);
-                        console.log(proportion);
+                        
                         // Atualizar o saldo do vencedor com o prêmio calculado
                         await connection.execute(
                             `UPDATE ACCOUNTS 

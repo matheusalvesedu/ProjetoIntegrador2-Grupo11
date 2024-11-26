@@ -14,7 +14,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 declare global {
     namespace Express {
         interface Request {
-            user?: { id: number; email: string };
+            user?: { id: number; email: string, typeUser: string };
         }
     }
 }
@@ -33,7 +33,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
     }
 
     try {
-        const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
+        const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string , typeUser: string};
         req.user = decoded; 
         next();
 

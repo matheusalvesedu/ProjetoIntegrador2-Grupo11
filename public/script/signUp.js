@@ -27,6 +27,7 @@ async function performSignUp(event) {
         if (response.ok) {
             const data = await response.json();
             showMessage(data.message);
+            await performSignIn(email, password);
         } else if (response.status === 400) {
             const data = await response.json();
             showMessage(data.message);
@@ -65,6 +66,35 @@ function showMessage(messageContent) {
     messageBox.style.display = "block";
 }
 
+async function performSignIn(email, password)  {
+    
+    try{
+        const h = new Headers();
+        h.append("Content-Type", "application/json");
+        h.append("email", email);
+        h.append("password", password);
+        const response = await fetch("http://localhost:3001/login", {
+            method: "POST",
+            headers: h,
+        });
+        if (response.ok) {
+
+            const data = await response.json();
+            const token = data.token;
+            localStorage.setItem("authToken", token);
+            window.location.href = "../pages/index.html";
+
+        } else if (response.status === 401) {
+            const data = await response.json();
+            showMessage(data.message);
+        } else {
+            showMessage("Erro interno no servidor. Tente novamente mais tarde.");
+        }
+    } catch (error) {
+        showMessage("Algo Inesperado aconteceu.");
+    }
+
+}
 
 function cleanError() {
     const messageBox = document.getElementById("messageBox");

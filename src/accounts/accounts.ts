@@ -14,7 +14,39 @@ export namespace AccountsHandler {
     export type UserData ={
         id: number;
         email: string;
+        typeUser: string;
     };
+
+    async function getTypeUserByEmail(email: string): Promise<string | null> {
+        let connection;
+        try {
+            connection = await OracleDB.getConnection({
+                user: process.env.ORACLE_USER,
+                password: process.env.ORACLE_PASSWORD,
+                connectString: process.env.ORACLE_CONN_STR,
+            });
+    
+            const result = await connection.execute(
+                'SELECT user_type FROM ACCOUNTS WHERE email = :email',
+                [email]
+            );
+    
+            if (result.rows && result.rows.length > 0) {
+                const user_type = (result.rows[0] as {typeUser: string}).typeUser; 
+                return user_type;
+            } else {
+                return null;
+            }
+        } catch (error) {
+            console.error('Erro ao buscar Tipo do usuário:', error);
+            return null; // Retornar null em caso de erro
+        } finally {
+            if (connection) {
+                await connection.close();
+            }
+        }
+    }
+
 
     async function getUserIdByEmail(email: string): Promise<number | null> {
         let connection;
@@ -63,10 +95,7 @@ export namespace AccountsHandler {
 
         return result.rows && result.rows.length > 0;
     }
-
-    //criar uma funcao get_type_user(moderador ou player)
     
-
     async function login(email: string, password: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
@@ -98,13 +127,14 @@ export namespace AccountsHandler {
                         return;
                     }
                     const id = await getUserIdByEmail(pEmail);
-                    const token = jwt.sign({ id: id, email: pEmail  }, JWT_SECRET, { expiresIn: '1h' });
+                    const user_type = await getTypeUserByEmail(pEmail);
+                    const token = jwt.sign({ id: id, email: pEmail, user_type: user_type  }, JWT_SECRET, { expiresIn: '2h' });
                     
-
                     res.status(200).json({
                         message: 'Login realizado com sucesso.',
                         token: token,
                         id: id,
+                        user_type: user_type,
                     });
                 } else {
                     res.status(401).json({ message: 'Credenciais inválidas. Acesso negado.' });
@@ -125,7 +155,7 @@ export namespace AccountsHandler {
 
         await connection.execute(
             'INSERT INTO ACCOUNTS (ID, complete_name, email, password, birthday_date, user_type, balance) VALUES (SEQ_ACCOUNTS.NEXTVAL, :complete_name, :email, :password, :birthday_date, :user_type, :balance)',
-            [name, email, password, birthday_date, 'PLAYER', 0]
+            [name, email, password, birthday_date, 'NEWPLAYER', 0]
         );
         await connection.execute('commit');
         await connection.close();
@@ -151,7 +181,7 @@ export namespace AccountsHandler {
                 await connection.close();
                 return;
             }
-
+            
             // Converte a data de nascimento para o formato Date
             const [year, month, day] = pBirthday_date.split('-').map(Number);
             const birthDate = new Date(year, month - 1, day);
