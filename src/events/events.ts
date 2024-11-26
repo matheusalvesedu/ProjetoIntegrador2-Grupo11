@@ -2,6 +2,7 @@ import { Request, RequestHandler, Response } from "express";
 import { FinancialManager } from "../financial/financial";
 import OracleDB from "oracledb";
 import dotenv from 'dotenv';
+import { Console } from "console";
 
 dotenv.config();
 
@@ -136,9 +137,6 @@ export namespace EventsHandler {
             { autoCommit: true }
         );
         
-
-
-
         return;
     }
 
@@ -161,8 +159,6 @@ export namespace EventsHandler {
             res.status(400).json({ message: 'Parâmetros Faltando.' });
         }
     }
-
-
 
     async function searchEvents(keyword: string) {
 
@@ -219,6 +215,35 @@ export namespace EventsHandler {
         }
     };
 
+
+    async function getBets(email:string){
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        let connection = await OracleDB.getConnection({
+            user: process.env.ORACLE_USER,
+            password: process.env.ORACLE_PASSWORD,
+            connectString: process.env.ORACLE_CONN_STR
+        });
+
+        let result = await connection.execute(
+            `SELECT * FROM BETS WHERE FK_ACCOUNT_EMAIL = :email`,
+            [email]
+        );
+
+        await connection.close();
+        return result.rows;
+    }
+
+    export const getBetsHandler: RequestHandler = async (req: Request, res: Response) => {
+        const pEmail = req.user?.email;
+        if (pEmail) {
+            const bets = await getBets(pEmail);
+            res.status(200).json(bets);
+        } else {    
+            res.status(400).json({ message: 'Parâmetros Faltando.' });
+        }
+    }
+
     async function betOnEvents(event_id: number, email: string, bet_value: number, bet_option: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
@@ -234,12 +259,14 @@ export namespace EventsHandler {
             bet_value,
             bet_option,
             FK_ACCOUNT_EMAIL,
+            bet_status,
             FK_EVENT_ID
             ) VALUES (
             SEQ_BETS.NEXTVAL,
             :bet_value,
             :bet_option,
             :email,
+            'EM ANDAMENTO',
             :event_id    
             )`,
             {
@@ -317,7 +344,7 @@ export namespace EventsHandler {
     };
 
     async function finishEvent(event_id: number, event_verdict: string) {
-
+        
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         let connection = await OracleDB.getConnection({
@@ -335,18 +362,32 @@ export namespace EventsHandler {
             `UPDATE EVENTS SET verdict = :event_verdict WHERE event_id = :event_id`,
             [event_verdict, event_id]
         );
-
         await connection.execute(
             `UPDATE EVENTS SET amount_wins = (SELECT SUM(bet_value) FROM BETS WHERE FK_EVENT_ID = :event_id AND bet_option = :event_verdict) WHERE event_id = :event_id`,
             { event_id: event_id, event_verdict: event_verdict }
-        )
+        );
+
         await connection.execute(
             `UPDATE EVENTS SET amount_loses = (SELECT SUM(bet_value) FROM BETS WHERE FK_EVENT_ID = :event_id AND bet_option != :event_verdict) WHERE event_id = :event_id`,
             { event_id: event_id, event_verdict: event_verdict }
-        )
+        );
+        
+        const lowerCaseVerdict = event_verdict.toLowerCase();
 
+        await connection.execute(
+            `UPDATE BETS 
+             SET bet_status = CASE 
+                 WHEN bet_option = :lowerCaseVerdict THEN 'GANHOU'
+                 ELSE 'PERDEU' 
+             END
+             WHERE FK_EVENT_ID = :event_id`,
+            { event_id: event_id, lowerCaseVerdict: lowerCaseVerdict }
+        );
         await connection.commit();
+        
+
         await connection.close();
+        return true;
     }
 
     async function distributeValues(event_id: number, event_verdict: string) {
@@ -359,26 +400,28 @@ export namespace EventsHandler {
             connectString: process.env.ORACLE_CONN_STR
         });
 
+        const lowerCaseVerdict = event_verdict.toLowerCase();
 
-        // Obter todos os valores de aposta para os vencedores no evento específico
         const result = await connection.execute(
             `SELECT BET_VALUE, FK_ACCOUNT_EMAIL 
             FROM BETS 
             WHERE FK_EVENT_ID = :event_id 
-            AND BET_OPTION = :user_option`,
-            { event_id: event_id, user_option: event_verdict }
+            AND BET_OPTION = :lowerCaseVerdict`,
+            { event_id, lowerCaseVerdict }
         );
+
+        console.log(result.rows);
 
         if (result.rows && result.rows.length > 0) {
             // Calcular o prêmio para cada vencedor
             for (const row of result.rows) {
                 const result_amount_wins = await connection.execute(
-                    `SELECT SUM(BET_VALUE) AS TOTAL FROM BETS WHERE FK_EVENT_ID = :event_id AND BET_OPTION = :event_verdict`,
-                    { event_id: event_id, event_verdict: event_verdict }
+                    `SELECT SUM(BET_VALUE) AS TOTAL FROM BETS WHERE FK_EVENT_ID = :event_id AND BET_OPTION = :lowerCaseVerdict`,
+                    { event_id: event_id, lowerCaseVerdict: lowerCaseVerdict }
                 );
                 const result_amount_loses = await connection.execute(
-                    `SELECT SUM(BET_VALUE) AS TOTAL FROM BETS WHERE FK_EVENT_ID = :event_id AND BET_OPTION != :event_verdict`,
-                    { event_id: event_id, event_verdict: event_verdict }
+                    `SELECT SUM(BET_VALUE) AS TOTAL FROM BETS WHERE FK_EVENT_ID = :event_id AND BET_OPTION != :lowerCaseVerdict`,
+                    { event_id: event_id, lowerCaseVerdict: lowerCaseVerdict }
                 );
                 if ((result_amount_wins.rows && result_amount_wins.rows.length > 0) && (result_amount_loses.rows && result_amount_loses.rows.length > 0)) {
                     const amount_wins = (result_amount_wins.rows[0] as any).TOTAL;
@@ -387,11 +430,14 @@ export namespace EventsHandler {
                     if (typeof row === 'object' && row !== null) {
                         let betValue = (row as any).BET_VALUE; // Valor da aposta de cada vencedor
                         let email = (row as any).FK_ACCOUNT_EMAIL; // Email do usuário vencedor
-
+                        console.log(betValue);
+                        console.log(amount_wins);
+                        console.log(betValue / amount_wins);
                         // Calcular a proporção e o prêmio individual
                         var proportion = betValue / amount_wins;
                         const prize = amount_loses * proportion;
-
+                        console.log(prize);
+                        console.log(proportion);
                         // Atualizar o saldo do vencedor com o prêmio calculado
                         await connection.execute(
                             `UPDATE ACCOUNTS 
@@ -405,6 +451,7 @@ export namespace EventsHandler {
 
             await connection.commit();
             await connection.close();
+            return true;
         }
     }
 
@@ -413,10 +460,19 @@ export namespace EventsHandler {
         const event_verdict = req.get('event_verdict');
 
         if (event_id && event_verdict) {
-            await finishEvent(parseInt(event_id), event_verdict);
-            await distributeValues(parseInt(event_id), event_verdict);
+            const finish= await finishEvent(parseInt(event_id), event_verdict);
+            if (finish){
+                const distribute = await distributeValues(parseInt(event_id), event_verdict);
+                if (distribute)
+                {
+                    res.status(200).json({ message: 'Evento Finalizado Com Sucesso.' });
+                } else{
+                    res.status(400).json({ message: 'Erro ao distribuir dinheiro.' });
+                }
 
-            res.status(200).json({ message: 'Evento Finalizado Com Sucesso.' });
+            } else{
+                res.status(400).json({ message: 'Erro ao finalizar evento.' });
+            }
         } else {
             res.status(400).json({ message: 'Parâmetros Faltando.' });
         }

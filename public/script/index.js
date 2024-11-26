@@ -101,7 +101,9 @@ async function handleBetSubmission(event) {
         });
 
         if (!response.ok) {
-            throw new Error("Erro ao enviar a aposta.");
+            const errorData = await response.json();
+            alert(`Erro ao enviar a aposta: ${errorData.message}`);
+            return;
         }
 
         alert("Aposta realizada com sucesso!");

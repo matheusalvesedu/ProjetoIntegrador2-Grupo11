@@ -167,6 +167,7 @@ button[type="submit"] {
 button[type="submit"]:hover {
     background-color: #b97206;
 }
+
 .historico-container {
     margin-top: 2rem;
     padding: 1.5rem;
@@ -202,3 +203,4 @@ button[type="submit"]:hover {
 .list-group-item span {
     font-weight: bold;
 }
+

@@ -53,16 +53,17 @@ server.use(express.json()); // Middleware para analisar JSON no corpo da requisi
 
 // Rotas protegidas (exemplo)
 routes.get('/getTransactions', authMiddleware, FinancialManager.getTransactionsHandler);
+routes.get('/getBets', authMiddleware, EventsHandler.getBetsHandler);
 routes.get('/getWallet', authMiddleware, FinancialManager.getWalletHandler);
 routes.put('/addEvent', authMiddleware, EventsHandler.addNewEventsHandler);
-routes.post('/deleteEvent', authMiddleware, EventsHandler.deleteEventHandler);
+routes.post('/deleteEvent', EventsHandler.deleteEventHandler);
 routes.post('/addFunds', authMiddleware, FinancialManager.addFundsHandler);
 routes.post('/withdrawFunds', authMiddleware, FinancialManager.withdrawFundsHandler);
 routes.post('/evaluateEvent', EventsHandler.evaluateEventHandler);
 routes.get('/searchEvents', authMiddleware, EventsHandler.searchEventsHandler);
 routes.get('/getEvents',  EventsHandler.getEventsHandler);
 routes.put('/betOnEvent', authMiddleware, EventsHandler.betOnEventsHandler);
-routes.post('/finishEvent', authMiddleware, EventsHandler.finishEventHandler);
+routes.post('/finishEvent', EventsHandler.finishEventHandler);
 
 // Rotas públicas específicas
 routes.post('/login', AccountsHandler.loginHandler);

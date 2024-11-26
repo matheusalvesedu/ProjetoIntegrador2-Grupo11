@@ -40,7 +40,7 @@ function updateWithdrawFields() {
     const amountField = document.getElementById('amountField');
     // Esconde todos os campos por padrão
     [pixFields, bankFields].forEach(field => field.classList.add('d-none'));
-    
+
     // Exibe os campos com base no método selecionado
 
     amountField.classList.remove('d-none');
@@ -48,15 +48,15 @@ function updateWithdrawFields() {
     if (method === 'pix') {
         pixFields.classList.remove('d-none');
         amountBox.style.display = "block";
-        
+
     } else if (method === 'bank') {
         bankFields.classList.remove('d-none');
     }
 
-    else{
+    else {
         amountField.classList.add('d-none');
     }
-    
+
 }
 
 function showMessage(messageContent) {
@@ -121,7 +121,7 @@ async function withdrawHandle(event) {
     if (!validateAmount(amount)) return;
     if (method === 'pix' && !validatePixFields()) return;
     if (method === 'bank' && !validateBankFields()) return;
-    
+
     try {
         // Configura os cabeçalhos com email e senha
         const reqtHeaders = new Headers();
@@ -134,21 +134,21 @@ async function withdrawHandle(event) {
             method: "POST",
             headers: reqtHeaders,
         });
-  
+
         if (response.ok) {
             const data = await response.json();
             showMessage(data.message); // Exibe a mensagem de sucesso (opcional)
         } else if (response.status === 400) {
             const data = await response.json();
             showMessage(data.message);
-        }  else {
+        } else {
             showMessage("Erro interno no servidor. Tente novamente mais tarde.");
         }
     } catch (error) {
         console.error("Erro na autenticação:", error);
         showMessage("Erro de conexão. Verifique sua internet.");
     }
-    
+
 }
 
 
@@ -156,28 +156,27 @@ async function handleAddFunds(event) {
     event.preventDefault();
 
     const amount = document.getElementById("fundsAmount").value;
-   console.log(amount);
+    console.log(amount);
 
     if (!isNaN(amount) && amount > 0) {
         // Simula a adição de créditos (você pode fazer uma chamada para o backend aqui)
-        
-        try{
+
+        try {
             const h = new Headers();
             h.append('Authorization', `Bearer ${localStorage.getItem('authToken')}`);
             h.append('funds', amount);
-            h.append('transactionType','DEPOSIT');
+            h.append('transactionType', 'DEPOSIT');
             const response = await fetch('http://localhost:3001/addFunds', {
                 method: 'POST',
                 headers: h
-            }); 
-            if(response.ok)
-            {
+            });
+            if (response.ok) {
                 const data = await response.json();
                 alert(data.message);
-                
+
             }
 
-            else{
+            else {
                 const errorData = await response.json();
                 alert(errorData.message);
             }
@@ -186,10 +185,10 @@ async function handleAddFunds(event) {
             modal.hide();
             window.location.reload();
         }
-        catch(error){
+        catch (error) {
             console.error('Erro:', error);
             alert('Ocorreu um erro ao adicionar fundos. Por favor, tente novamente.');
-        }     
+        }
         // Limpa o campo de entrada
         fundsInput.value = "";
 
@@ -253,8 +252,62 @@ async function renderDeposit() {
     }
 }
 
+async function renderBets() {
+    try {
+        const headers = new Headers();
+        headers.append('Authorization', `Bearer ${localStorage.getItem('authToken')}`);
+
+        const response = await fetch('http://localhost:3001/getBets', {
+            method: 'GET',
+            headers: headers,
+        });
+
+        if (!response.ok) {
+            throw new Error('Erro ao buscar dados das apostas.');
+        }
+
+        const betData = await response.json();
+
+        // Selecionando o elemento da lista
+        const historyList = document.getElementById('betHistoryList');
+
+        // Limpando a lista antes de adicionar os itens
+        historyList.innerHTML = '';
+
+        // Iterando pelos dados recebidos
+        betData.forEach(bet => {
+            // Criando um elemento de lista
+            const listItem = document.createElement('li');
+            listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+
+            // Criando o conteúdo a ser exibido
+            const betInfo = `
+                <div>
+                    <strong>Valor da aposta:</strong> R$${bet.BET_VALUE.toFixed(2)}<br>
+                    <strong>Opção:</strong>${bet.BET_OPTION.charAt(0).toUpperCase() + bet.BET_OPTION.slice(1).toLowerCase()}<br>
+                </div>
+            `;
+
+            // Calculando e exibindo os ganhos, se aplicável
+            const gainInfo = bet.BET_STATUS === 'GANHOU' && bet.USER_PROPORTION
+                ? `<span class="badge bg-success">Ganhou R$${(bet.BET_VALUE * bet.USER_PROPORTION).toFixed(2)}</span>`
+                : `<span class="badge bg-secondary">${bet.BET_STATUS || 'Pendente'}</span>`;
+
+            // Adicionando os conteúdos ao item da lista
+            listItem.innerHTML = `${betInfo} ${gainInfo}`;
+
+            // Adicionando o item à lista
+            historyList.appendChild(listItem);
+        });
+    } catch (error) {
+        console.error('Erro ao renderizar apostas:', error);
+        alert('Não foi possível carregar o histórico de apostas.');
+    }
+}
 
 window.onload = () => {
     renderDeposit();
+    renderBets();
     getWallet();
+
 };

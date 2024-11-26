@@ -133,7 +133,6 @@ export namespace FinancialManager {
 
         if (pEmail && pFunds && transaction_type) {
             const funds = parseFloat(pFunds);
-            console.log(funds);
             if (funds > 0 && await addFunds(pEmail, funds)) {
                 await createTransaction(pEmail, funds, transaction_type);
                 res.status(200).json({ message: 'Depósito concluído com sucesso!' });
