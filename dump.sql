@@ -62,6 +62,7 @@ CREATE TABLE EVENTS
     event_description VARCHAR(150),
     eventStartDate VARCHAR(10),
     eventFinalDate VARCHAR(10),
+    eventDate VARCHAR(10),
     event_status VARCHAR(20),
     verdict VARCHAR(3),
     amount_wins DECIMAL(10,2),

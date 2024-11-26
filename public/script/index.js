@@ -43,6 +43,7 @@ async function renderEvents() {
             <p><strong>Descrição:</strong> ${event.EVENT_DESCRIPTION}</p>
             <p><strong>Data de Início:</strong> ${event.EVENTSTARTDATE}</p>
             <p><strong>Data de Fim:</strong> ${event.EVENTFINALDATE}</p>
+            <p><strong>Categoria:</strong> ${event.CATEGORY}</p>
             <button class="btn-warning bet-btn" data-id="${event.EVENT_ID}" data-title="${event.EVENT_TITLE}">
                 Apostar
             </button>

@@ -58,27 +58,37 @@ body {
     margin-top: 16px; /* Trocado de % para px */
 }
 
-.bet-card {
+.card {
     background-color: var(--color-secondary);
     border: 1px solid var(--color-quaternary);
-    padding: 16px; /* Trocado de % para px */
+    padding: 16px; /* Mantido em px para consistência */
     border-radius: 8px;
     color: var(--color-tertiary);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    width: 400px; /* Largura fixa para cada card */
+    flex: 1 1 calc(33.333%);
+    max-width: 500px; /* Limita a largura máxima de cada card */
+    box-sizing: border-box;/* Adiciona margem para espaçamento entre cards */
 }
 
-.bet-card:hover {
+.card:hover {
     transform: translateY(-5px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
-.bet-card h3 {
+.card h3 {
     font-size: 22px;
-    margin-bottom: 8px; /* Trocado de % para px */
+    margin-bottom: 8px;
     color: var(--color-quinary);
+}   
+
+#events-container {
+    display: flex; /* Usa flexbox para controle de layout */
+    flex-wrap: wrap; /* Permite que os itens "quebrem" para a linha seguinte */
+    justify-content: center; /* Centraliza os cards na linha */
+    margin-top: 16px; /* Espaçamento superior */
 }
+
 
 .btn {
     padding: 8px 16px; /* Trocado de % para px */
