@@ -173,11 +173,16 @@ export namespace EventsHandler {
         });
 
         let result = await connection.execute(
-            `SELECT * FROM EVENTS WHERE event_title LIKE '%${keyword}%' OR event_description LIKE '%${keyword}% OR category LIKE '%${keyword}%'`
+            `SELECT * FROM EVENTS WHERE (event_title LIKE '%${keyword}%' OR event_description LIKE '%${keyword}%' OR category LIKE '%${keyword}%') AND event_status = 'Aprovado'`
         );
-
+        
         await connection.close();
-        return result.rows;
+
+        if (result.rows && result.rows.length > 0) {
+            return result.rows;
+        } else {
+            return ;
+        }
     }
 
     export const searchEventsHandler: RequestHandler = async (req: Request, res: Response) => {

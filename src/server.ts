@@ -7,7 +7,6 @@ import { FinancialManager } from "./financial/financial";
 import { EventsHandler } from "./events/events";
 
 dotenv.config();
-
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // Extensão da interface Request para incluir `user`
