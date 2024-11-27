@@ -1,3 +1,4 @@
+
 // Função para buscar eventos com o status "Aprovado"
 async function getEvents() {
     const eventStatus = "Aprovado";
@@ -40,7 +41,9 @@ async function renderEvents(action) {
             events = await searchEvents(keyword); // Busca eventos pelo termo
         } else if (action === "bets") {
             events = await getEventsByBets(); // Busca eventos com informações de apostas
-        } else {
+        } else if(action === "date"){
+            events = await getEventsDate(); // Busca eventos com informações de data
+        }else {
             return [];
         }
 
@@ -146,31 +149,6 @@ async function handleBetSubmission(event) {
     }
 }
 
-
-document.addEventListener("DOMContentLoaded", () => {
-    renderEvents("Aprovado");
-
-    // Evento para submissão do formulário de aposta
-    const betForm = document.getElementById("betForm");
-    betForm.addEventListener("submit", handleBetSubmission);
-
-    // Evento para o botão de pesquisa
-    const searchButton = document.getElementById("searchButton");
-    searchButton.addEventListener("click", () => renderEvents("search"));
-
-    const eventsByBets = document.getElementById("mostBetEvents");
-    eventsByBets.addEventListener("click", () => renderEvents("bets"));
-
-    // Evento para os links de categorias
-    const categoryLinks = document.querySelectorAll(".category-link");
-    categoryLinks.forEach(link => {
-        link.addEventListener("click", (event) => {
-            event.preventDefault(); // Evita a navegação padrão do link
-            const category = link.getAttribute("data-category");
-            renderEventsByCategory(category);
-        });
-    });
-});
 
 async function searchEvents(category) {
 
@@ -309,6 +287,26 @@ async function getEventsByBets(){
     }
 }
 
+async function getEventsDate(){
+    try{
+        const response = await fetch("http://localhost:3001/getEventsDate", {
+            method: "GET",
+        });
+
+        if(response.ok)
+        {
+            const data = await response.json();
+            return data;
+        } else{
+            throw new Error("Erro ao carregar eventos.");
+        }
+    }
+    catch(error){
+        console.error("Erro na busca dos eventos:", error);
+        return [];
+    }
+}
+
 function verificarUsuario(token) {
     try {
         // Decodificar o token (exemplo: se for um JWT)
@@ -332,3 +330,31 @@ const token = localStorage.getItem('token'); // Recupera o token armazenado (se 
 if (token) {
     verificarUsuario(token);
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    renderEvents("Aprovado");
+
+    // Evento para submissão do formulário de aposta
+    const betForm = document.getElementById("betForm");
+    betForm.addEventListener("submit", handleBetSubmission);
+
+    // Evento para o botão de pesquisa
+    const searchButton = document.getElementById("searchButton");
+    searchButton.addEventListener("click", () => renderEvents("search"));
+
+    const eventsByBets = document.getElementById("mostBetEvents");
+    eventsByBets.addEventListener("click", () => renderEvents("bets"));
+
+    const eventsByDate = document.getElementById("expiringEvents");
+    eventsByDate.addEventListener("click", () => renderEvents("date"));
+
+    // Evento para os links de categorias
+    const categoryLinks = document.querySelectorAll(".category-link");
+    categoryLinks.forEach(link => {
+        link.addEventListener("click", (event) => {
+            event.preventDefault(); // Evita a navegação padrão do link
+            const category = link.getAttribute("data-category");
+            renderEventsByCategory(category);
+        });
+    });
+});

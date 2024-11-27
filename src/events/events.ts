@@ -62,7 +62,7 @@ export namespace EventsHandler {
         } else {
             res.status(400).json({ message: 'Parâmetros Faltando.' });
         }
-        };
+    };
 
     async function deleteEvent(eventId: number) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
@@ -87,9 +87,9 @@ export namespace EventsHandler {
         if (eventId) {
             const id = parseFloat(eventId);
             await deleteEvent(id);
-            res.status(200).json({message: 'Evento Excluído Com Sucesso.'});
+            res.status(200).json({ message: 'Evento Excluído Com Sucesso.' });
         } else {
-            res.status(400).json({message: 'Parâmetros Faltando.'});
+            res.status(400).json({ message: 'Parâmetros Faltando.' });
         }
     }
 
@@ -115,10 +115,10 @@ export namespace EventsHandler {
             await connection.close();
             return false;
         }
-      
+
     }
 
-    async function evaluateEvent(eventId: number, event_status: string, category: string)  {
+    async function evaluateEvent(eventId: number, event_status: string, category: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         const connection = await OracleDB.getConnection({
@@ -138,7 +138,7 @@ export namespace EventsHandler {
             [category, eventId],
             { autoCommit: true }
         );
-        
+
         return;
     }
 
@@ -151,7 +151,7 @@ export namespace EventsHandler {
         if (eventId && eventStatus && textMessage && category) {
             const id = parseInt(eventId);
             const validacao = await validateEvent(id);
-            if  (!validacao) {
+            if (!validacao) {
                 res.status(404).json({ message: 'Evento não encontrado.' });
                 return;
             }
@@ -175,13 +175,13 @@ export namespace EventsHandler {
         let result = await connection.execute(
             `SELECT * FROM EVENTS WHERE (event_title LIKE '%${keyword}%' OR event_description LIKE '%${keyword}%' OR category LIKE '%${keyword}%') AND event_status = 'Aprovado'`
         );
-        
+
         await connection.close();
 
         if (result.rows && result.rows.length > 0) {
             return result.rows;
         } else {
-            return ;
+            return;
         }
     }
 
@@ -191,7 +191,7 @@ export namespace EventsHandler {
             const events = await searchEvents(keyword);
             res.status(200).json(events);
         } else {
-            res.status(400).json({message: 'Parâmetros Faltando.'});
+            res.status(400).json({ message: 'Parâmetros Faltando.' });
         }
     };
 
@@ -223,7 +223,7 @@ export namespace EventsHandler {
     };
 
 
-    async function getBets(email:string){
+    async function getBets(email: string) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         let connection = await OracleDB.getConnection({
@@ -246,7 +246,7 @@ export namespace EventsHandler {
         if (pEmail) {
             const bets = await getBets(pEmail);
             res.status(200).json(bets);
-        } else {    
+        } else {
             res.status(400).json({ message: 'Parâmetros Faltando.' });
         }
     }
@@ -318,7 +318,7 @@ export namespace EventsHandler {
     }
 
     export const betOnEventsHandler: RequestHandler = async (req: Request, res: Response) => {
-        const event_id = req.get('event_id');   
+        const event_id = req.get('event_id');
         const pemail = req.user?.email;
         const bet_value = req.get('bet_value');
         const bet_option = req.get('bet_option');
@@ -351,7 +351,7 @@ export namespace EventsHandler {
     };
 
     async function finishEvent(event_id: number, event_verdict: string) {
-        
+
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         let connection = await OracleDB.getConnection({
@@ -378,7 +378,7 @@ export namespace EventsHandler {
             `UPDATE EVENTS SET amount_loses = (SELECT SUM(bet_value) FROM BETS WHERE FK_EVENT_ID = :event_id AND bet_option != :event_verdict) WHERE event_id = :event_id`,
             { event_id: event_id, event_verdict: event_verdict }
         );
-        
+
         const lowerCaseVerdict = event_verdict.toLowerCase();
 
         await connection.execute(
@@ -391,7 +391,7 @@ export namespace EventsHandler {
             { event_id: event_id, lowerCaseVerdict: lowerCaseVerdict }
         );
         await connection.commit();
-        
+
 
         await connection.close();
         return true;
@@ -436,11 +436,11 @@ export namespace EventsHandler {
                     if (typeof row === 'object' && row !== null) {
                         let betValue = (row as any).BET_VALUE; // Valor da aposta de cada vencedor
                         let email = (row as any).FK_ACCOUNT_EMAIL; // Email do usuário vencedor
-                 
+
                         // Calcular a proporção e o prêmio individual
                         var proportion = betValue / amount_wins;
                         const prize = amount_loses * proportion;
-                        
+
                         // Atualizar o saldo do vencedor com o prêmio calculado
                         await connection.execute(
                             `UPDATE ACCOUNTS 
@@ -463,17 +463,16 @@ export namespace EventsHandler {
         const event_verdict = req.get('event_verdict');
 
         if (event_id && event_verdict) {
-            const finish= await finishEvent(parseInt(event_id), event_verdict);
-            if (finish){
+            const finish = await finishEvent(parseInt(event_id), event_verdict);
+            if (finish) {
                 const distribute = await distributeValues(parseInt(event_id), event_verdict);
-                if (distribute)
-                {
+                if (distribute) {
                     res.status(200).json({ message: 'Evento Finalizado Com Sucesso.' });
-                } else{
+                } else {
                     res.status(400).json({ message: 'Erro ao distribuir dinheiro.' });
                 }
 
-            } else{
+            } else {
                 res.status(400).json({ message: 'Erro ao finalizar evento.' });
             }
         } else {
@@ -505,7 +504,7 @@ export namespace EventsHandler {
             JOIN 
                 BETS B ON E.EVENT_ID = B.FK_EVENT_ID
             WHERE 
-                B.BET_STATUS = 'EM ANDAMENTO'
+                B.BET_STATUS = 'EM ANDAMENTO' AND E.EVENT_STATUS = 'Aprovado'
             GROUP BY 
                 E.EVENT_ID, 
                 E.EVENT_TITLE, 
@@ -522,7 +521,6 @@ export namespace EventsHandler {
         return result.rows;
     }
 
-
     export const getEventsByTotalBetsHandler: RequestHandler = async (req: Request, res: Response) => {
         try {
             const events = await getEventsByTotalBets();
@@ -533,7 +531,50 @@ export namespace EventsHandler {
             }
         } catch (error) {
             res.status(500).json({ message: 'Erro ao buscar eventos .' });
-        }     
+        }
+    }
+
+
+    async function getEventsDate() {
+        try {
+            OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+            let connection = await OracleDB.getConnection({
+                user: process.env.ORACLE_USER,
+                password: process.env.ORACLE_PASSWORD,
+                connectString: process.env.ORACLE_CONN_STR
+            });
+            let result = await connection.execute(
+                `SELECT 
+                    E.EVENT_ID, 
+                    E.EVENT_TITLE, 
+                    E.EVENT_DESCRIPTION,
+                    E.EVENTSTARTDATE,
+                    E.EVENTFINALDATE,
+                    E.EVENTDATE,
+                    E.CATEGORY
+                FROM 
+                    EVENTS E
+                WHERE 
+                    TO_DATE(E.EVENTFINALDATE, 'YYYY-MM-DD') >= SYSDATE AND 
+                    E.EVENT_STATUS = 'Aprovado'
+                ORDER BY 
+                    TO_DATE(E.EVENTFINALDATE, 'YYYY-MM-DD') ASC`
+            );
+            await connection.close();
+            return result.rows;
+        } catch (error) {
+            return undefined;
+        }
+    }
+
+    export const getEventsDateHandler: RequestHandler = async (req: Request, res: Response) => {
+
+        const events = await getEventsDate();
+        if (events) {
+            res.status(200).json(events);
+        } else {
+            res.status(404).json({ message: 'Eventos não encontrados.' });
+        }
     }
 }
 
