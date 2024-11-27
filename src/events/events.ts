@@ -480,5 +480,60 @@ export namespace EventsHandler {
             res.status(400).json({ message: 'Parâmetros Faltando.' });
         }
     }
+
+    async function getEventsByTotalBets() {
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        let connection = await OracleDB.getConnection({
+            user: process.env.ORACLE_USER,
+            password: process.env.ORACLE_PASSWORD,
+            connectString: process.env.ORACLE_CONN_STR
+        });
+
+        let result = await connection.execute(
+            `SELECT 
+                E.EVENT_ID, 
+                E.EVENT_TITLE, 
+                E.EVENT_DESCRIPTION,
+                E.EVENTSTARTDATE,
+                E.EVENTFINALDATE,
+                E.EVENTDATE,
+                E.CATEGORY,
+                COUNT(B.BET_ID) AS TOTAL_BETS
+            FROM 
+                EVENTS E
+            JOIN 
+                BETS B ON E.EVENT_ID = B.FK_EVENT_ID
+            WHERE 
+                B.BET_STATUS = 'EM ANDAMENTO'
+            GROUP BY 
+                E.EVENT_ID, 
+                E.EVENT_TITLE, 
+                E.EVENT_DESCRIPTION,
+                E.EVENTSTARTDATE,
+                E.EVENTFINALDATE,
+                E.EVENTDATE,
+                E.CATEGORY
+            ORDER BY 
+                TOTAL_BETS DESC`
+        );
+
+        await connection.close();
+        return result.rows;
+    }
+
+
+    export const getEventsByTotalBetsHandler: RequestHandler = async (req: Request, res: Response) => {
+        try {
+            const events = await getEventsByTotalBets();
+            if (events) {
+                res.status(200).json(events);
+            } else {
+                res.status(404).json({ message: 'Eventos não encontrados.' });
+            }
+        } catch (error) {
+            res.status(500).json({ message: 'Erro ao buscar eventos .' });
+        }     
+    }
 }
 

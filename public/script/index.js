@@ -23,9 +23,8 @@ async function getEvents() {
 }
 
 async function renderEvents(action) {
-     
     const container = document.getElementById("events-container");
-    container.innerHTML = ""; 
+    container.innerHTML = "";
 
     let events = [];
     try {
@@ -39,13 +38,15 @@ async function renderEvents(action) {
                 return;
             }
             events = await searchEvents(keyword); // Busca eventos pelo termo
+        } else if (action === "bets") {
+            events = await getEventsByBets(); // Busca eventos com informações de apostas
         } else {
-            throw new Error("Ação inválida para renderização de eventos.");
+            return [];
         }
 
         // Verifica se há eventos retornados
         if (events.length === 0) {
-            container.innerHTML = `<p class='text-center'>${action === "approved" ? "Nenhum evento aprovado disponível." : "Nenhum evento encontrado para a busca."}</p>`;
+            container.innerHTML = `<p class='text-center'>${action === "Aprovado" ? "Nenhum evento aprovado disponível." : "Nenhum evento encontrado para a busca."}</p>`;
             return;
         }
 
@@ -53,6 +54,10 @@ async function renderEvents(action) {
         events.forEach((event) => {
             const eventCard = document.createElement("div");
             eventCard.className = "col-md-4 mb-4";
+
+            const totalBetsInfo = action === "bets" && event.TOTAL_BETS 
+                ? `<p><strong>Total de Apostas:</strong> ${event.TOTAL_BETS}</p>`
+                : "";
 
             eventCard.innerHTML = `
                 <div class="card p-3 shadow-sm">
@@ -62,6 +67,7 @@ async function renderEvents(action) {
                     <p><strong>Data de Fim:</strong> ${event.EVENTFINALDATE}</p>
                     <p><strong>Data do evento:</strong> ${event.EVENTDATE}</p>
                     <p><strong>Categoria:</strong> ${event.CATEGORY}</p>
+                    ${totalBetsInfo}
                     <button class="btn-warning bet-btn" data-id="${event.EVENT_ID}" data-title="${event.EVENT_TITLE}">
                         Apostar
                     </button>
@@ -89,7 +95,6 @@ async function renderEvents(action) {
         container.innerHTML = `<p class='text-center'>Erro ao carregar eventos.</p>`;
     }
 }
-
 
 // Função para lidar com a submissão da aposta
 async function handleBetSubmission(event) {
@@ -153,6 +158,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const searchButton = document.getElementById("searchButton");
     searchButton.addEventListener("click", () => renderEvents("search"));
 
+    const eventsByBets = document.getElementById("mostBetEvents");
+    eventsByBets.addEventListener("click", () => renderEvents("bets"));
+
     // Evento para os links de categorias
     const categoryLinks = document.querySelectorAll(".category-link");
     categoryLinks.forEach(link => {
@@ -167,7 +175,6 @@ document.addEventListener("DOMContentLoaded", () => {
 async function searchEvents(category) {
 
     const eventStatus = "Aprovado";
-    alert(category);
     h = new Headers();
     h.append("Authorization", `Bearer ${localStorage.getItem("authToken")}`);
     h.append("event_status", eventStatus);
@@ -244,5 +251,26 @@ async function renderEventsByCategory(category) {
     } catch (error) {
         console.error("Erro na renderização dos eventos:", error);
         container.innerHTML = `<p class='text-center'>Erro ao carregar eventos.</p>`;
+    }
+}
+
+async function getEventsByBets(){
+
+    try{
+        const response = await fetch("http://localhost:3001/getEventsBets", {
+            method: "GET",
+        });
+
+        if(response.ok)
+        {
+            const data = await response.json();
+            return data;
+        } else{
+            throw new Error("Erro ao carregar eventos.");
+        }
+    }
+    catch(error){
+        console.error("Erro na busca dos eventos:", error);
+        return [];
     }
 }
