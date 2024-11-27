@@ -6,7 +6,7 @@ if (localStorage.getItem('authToken') === null) {
     // Redireciona após um tempo para que o usuário veja a mensagem
     setTimeout(() => {
         window.location.href = '../pages/signIN.html';
-    }, 3000); // Redireciona após 3 segundos
+    }, 3000); 
 }
 
 function getToken() {
@@ -170,7 +170,11 @@ async function handleAddFunds(event) {
     event.preventDefault();
 
     const amount = document.getElementById("fundsAmount").value;
-    console.log(amount);
+
+    if (parseFloat(amount) > 99999999.99) {
+        alert("O valor não pode ser maior que 99.999.999,99.");
+        return;
+    }
 
     if (!isNaN(amount) && amount > 0) {
         // Simula a adição de créditos (você pode fazer uma chamada para o backend aqui)
