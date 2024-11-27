@@ -1,3 +1,13 @@
+if (localStorage.getItem('authToken') === null) {
+    const messageDiv = document.getElementById('message');
+    messageDiv.textContent = 'Você precisa estar logado';
+    messageDiv.style.display = 'block';
+
+    setTimeout(() => {
+        window.location.href = '../pages/signIN.html';
+    }, 3000); // Redireciona após 3 segundos
+}
+
 async function handle(event) {
     event.preventDefault();
     createEvent();

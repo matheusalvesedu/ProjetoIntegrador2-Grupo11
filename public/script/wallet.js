@@ -1,3 +1,14 @@
+if (localStorage.getItem('authToken') === null) {
+    const messageDiv = document.getElementById('message');
+    messageDiv.textContent = 'Você precisa estar logado';
+    messageDiv.style.display = 'block';
+
+    // Redireciona após um tempo para que o usuário veja a mensagem
+    setTimeout(() => {
+        window.location.href = '../pages/signIN.html';
+    }, 3000); // Redireciona após 3 segundos
+}
+
 function getToken() {
     return localStorage.getItem("authToken"); // Supondo que o token é armazenado no localStorage
 }
@@ -210,6 +221,8 @@ async function renderDeposit() {
             method: 'GET',
             headers: h,
         });
+        
+        console.log("Resposta de histórico de créditos:", response.json);
 
         const depositData = await response.json();
 
@@ -261,6 +274,7 @@ async function renderBets() {
             method: 'GET',
             headers: headers,
         });
+
 
         if (!response.ok) {
             throw new Error('Erro ao buscar dados das apostas.');
