@@ -243,7 +243,7 @@ export namespace FinancialManager {
             return;
             }
 
-            if (saque > 101000) {
+            if (saque > 100000) {
             res.status(400).json({ error: 'Quantia de saque excedeu o limite diário' });
             return;
             }

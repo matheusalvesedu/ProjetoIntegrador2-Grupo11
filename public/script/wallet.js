@@ -148,10 +148,13 @@ async function withdrawHandle(event) {
 
         if (response.ok) {
             const data = await response.json();
-            showMessage(data.message); // Exibe a mensagem de sucesso (opcional)
+            const saque = data.saque;
+            const taxa = data.taxa;
+            const recebido = saque - taxa;
+            showMessage(`Saque concluído com sucesso! Valor do saque: R$${saque.toFixed(2)}, Taxa: R$${taxa.toFixed(2)}, Valor recebido: R$${recebido.toFixed(2)}`);
         } else if (response.status === 400) {
             const data = await response.json();
-            showMessage(data.message);
+            showMessage(data.error);
         } else {
             showMessage("Erro interno no servidor. Tente novamente mais tarde.");
         }
