@@ -63,6 +63,7 @@ routes.get('/searchEvents', authMiddleware, EventsHandler.searchEventsHandler);
 routes.get('/getEvents',  EventsHandler.getEventsHandler);
 routes.put('/betOnEvent', authMiddleware, EventsHandler.betOnEventsHandler);
 routes.post('/finishEvent', EventsHandler.finishEventHandler);
+routes.get("/getEventsBets", EventsHandler.getEventsByTotalBetsHandler);
 
 // Rotas públicas específicas
 routes.post('/login', AccountsHandler.loginHandler);
