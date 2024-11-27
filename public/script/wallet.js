@@ -21,7 +21,7 @@ async function getWallet() {
             const saldo = await response.text();
             document.getElementById("wallet").textContent = saldo;
         } else {
-            document.getElementById("wallet").textContent = "Erro ao carregar.";
+            document.getElementById("wallet").textContent = "R$ 0.00";
         }
     } catch (error) {
         console.error(error);

@@ -269,7 +269,7 @@ async function getWallet() {
             const saldo = await response.text();
             document.getElementById("wallet").textContent = saldo;
         } else {
-            document.getElementById("wallet").textContent = "Erro ao carregar.";
+            document.getElementById("wallet").textContent = "R$ 0.00";
         }
     } catch (error) {
         console.error(error);
@@ -280,3 +280,27 @@ async function getWallet() {
 window.onload = () => {
     getWallet();
 };
+
+function verificarUsuario(token) {
+    try {
+        // Decodificar o token (exemplo: se for um JWT)
+        const payloadBase64 = token.split('.')[1]; // Pega o payload do JWT
+        const payloadDecoded = atob(payloadBase64); // Decodifica de Base64
+        const userData = JSON.parse(payloadDecoded); // Converte para objeto JSON
+
+        // Verificar se o usertype é newPlayer
+        if (userData.usertype === 'NEWPLAYER') {
+            const modal = new bootstrap.Modal(document.getElementById('buyCreditsModal'));
+            modal.show();
+        }
+    } catch (error) {
+        console.error("Erro ao verificar o token:", error);
+    }
+}
+
+// Exemplo de uso:
+// Substitua "seuTokenAqui" pelo token do usuário
+const token = localStorage.getItem('token'); // Recupera o token armazenado (se existir)
+if (token) {
+    verificarUsuario(token);
+}
