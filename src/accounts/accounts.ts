@@ -14,7 +14,7 @@ export namespace AccountsHandler {
     export type UserData ={
         id: number;
         email: string;
-        typeUser: string;
+        user_type: string;
     };
 
     async function getTypeUserByEmail(email: string): Promise<string | null> {
@@ -32,7 +32,7 @@ export namespace AccountsHandler {
             );
     
             if (result.rows && result.rows.length > 0) {
-                const user_type = (result.rows[0] as {typeUser: string}).typeUser; 
+                const user_type = (result.rows[0] as any).USER_TYPE;
                 return user_type;
             } else {
                 return null;
@@ -46,6 +46,20 @@ export namespace AccountsHandler {
             }
         }
     }
+
+    export const getUserTypeHandler: RequestHandler = async (req: Request, res: Response) => {
+        const email = req.user?.email;
+        if (email) {
+            const user_type = await getTypeUserByEmail(email);
+            if (user_type) {
+                res.status(200).json({ typeUser: user_type });
+            } else {
+                res.status(400).json({ message: 'Tipo do usuário não encontrado.' });
+            }
+        } else {
+            res.status(400).json({ message: 'Requisição inválida - Parâmetros faltando.' });
+        }
+    };
 
 
     async function getUserIdByEmail(email: string): Promise<number | null> {
@@ -128,7 +142,8 @@ export namespace AccountsHandler {
                     }
                     const id = await getUserIdByEmail(pEmail);
                     const user_type = await getTypeUserByEmail(pEmail);
-                    const token = jwt.sign({ id: id, email: pEmail, user_type: user_type  }, JWT_SECRET, { expiresIn: '2h' });
+                    console.log(user_type);
+                    const token = jwt.sign({ id: id, email: pEmail, user_type: user_type  }, JWT_SECRET, { expiresIn: '12h' });
                     
                     res.status(200).json({
                         message: 'Login realizado com sucesso.',

@@ -15,10 +15,6 @@ async function handle(event) {
 // Função que será chamada quando o formulário for enviado
 async function createEvent(event) {
     const title = document.getElementById('title').value;
-    if (title === "eu vou fazer um leilao") {
-        window.location.href = 'https://youtu.be/rS2FDyOKR2g?si=fCGeLc8pEKvGy-HM&t=37';
-        return;
-    }
     const description = document.getElementById('description').value;
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;

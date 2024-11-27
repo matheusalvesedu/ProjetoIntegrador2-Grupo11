@@ -319,28 +319,23 @@ async function getEventsDate(){
     }
 }
 
-function verificarUsuario(token) {
+async function verificarUsuario() {
     try {
-        // Decodificar o token (exemplo: se for um JWT)
-        const payloadBase64 = token.split('.')[1]; // Pega o payload do JWT
-        const payloadDecoded = atob(payloadBase64); // Decodifica de Base64
-        const userData = JSON.parse(payloadDecoded); // Converte para objeto JSON
-
+        const response = await
+        fetch("http://localhost:3001/getTypeUser", {
+            method: "GET",
+            headers: {'Authorization': `Bearer ${localStorage.getItem('authToken')}`},
+            });
+        
+        const data = await response.json();
         // Verificar se o usertype é newPlayer
-        if (userData.usertype === 'NEWPLAYER') {
+        if (data.typeUser === 'NEWPLAYER') {
             const modal = new bootstrap.Modal(document.getElementById('buyCreditsModal'));
             modal.show();
         }
     } catch (error) {
         console.error("Erro ao verificar o token:", error);
     }
-}
-
-// Exemplo de uso:
-// Substitua "seuTokenAqui" pelo token do usuário
-const token = localStorage.getItem('token'); // Recupera o token armazenado (se existir)
-if (token) {
-    verificarUsuario(token);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -370,3 +365,5 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+window.onload = verificarUsuario;

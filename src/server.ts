@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import { AccountsHandler } from "./accounts/accounts";
 import { FinancialManager } from "./financial/financial";
 import { EventsHandler } from "./events/events";
+import { decode } from "punycode";
 
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -34,6 +35,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
     try {
         const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string , typeUser: string};
         req.user = decoded; 
+        console.log(decoded);
         next();
 
     } catch (error) {
@@ -65,6 +67,8 @@ routes.put('/betOnEvent', authMiddleware, EventsHandler.betOnEventsHandler);
 routes.post('/finishEvent', EventsHandler.finishEventHandler);
 routes.get("/getEventsBets", EventsHandler.getEventsByTotalBetsHandler);
 routes.get("/getEventsDate", EventsHandler.getEventsDateHandler);
+routes.get("/getTypeUser", authMiddleware, AccountsHandler.getUserTypeHandler);
+
 
 // Rotas públicas específicas
 routes.post('/login', AccountsHandler.loginHandler);
