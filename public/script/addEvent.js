@@ -19,9 +19,7 @@ async function createEvent(event) {
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
     const Date = document.getElementById('Date').value;
-    console.log(startDate, endDate);
     const token = localStorage.getItem('authToken');
-    console.log(token);
     try {
         const h = new Headers();
         h.append('Content-Type', 'application/json');
@@ -31,8 +29,6 @@ async function createEvent(event) {
         h.append('eventStartDate', startDate);
         h.append('eventFinalDate', endDate);
         h.append('eventDate', Date);
-        
-        console.log(h);
         const response = await fetch('http://localhost:3001/addEvent', {
             method: 'PUT',
             headers: h

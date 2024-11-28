@@ -555,7 +555,7 @@ export namespace EventsHandler {
                 FROM 
                     EVENTS E
                 WHERE 
-                    TO_DATE(E.EVENTFINALDATE, 'YYYY-MM-DD') >= SYSDATE AND 
+                    TO_DATE(E.EVENTFINALDATE, 'YYYY-MM-DD') >= TRUNC(SYSDATE) AND 
                     E.EVENT_STATUS = 'Aprovado'
                 ORDER BY 
                     TO_DATE(E.EVENTFINALDATE, 'YYYY-MM-DD') ASC`

@@ -1,3 +1,4 @@
+
 if (localStorage.getItem('authToken') === null) {
     const messageDiv = document.getElementById('message');
     messageDiv.textContent = 'Você precisa estar logado';
@@ -8,8 +9,6 @@ if (localStorage.getItem('authToken') === null) {
         window.location.href = '../pages/signIN.html';
     }, 3000); // Redireciona após 3 segundos
 }
-
-
 
 // Função para buscar eventos com o status "Aprovado"
 async function getEvents() {
@@ -274,9 +273,6 @@ async function getWallet() {
     }
 }
 
-window.onload = () => {
-    getWallet();
-};
 
 async function getEventsByBets(){
 
@@ -332,6 +328,8 @@ async function verificarUsuario() {
         if (data.typeUser === 'NEWPLAYER') {
             const modal = new bootstrap.Modal(document.getElementById('buyCreditsModal'));
             modal.show();
+        } else if(data.typeUser === 'ADMIN'){
+            alert("Você é um administrador");
         }
     } catch (error) {
         console.error("Erro ao verificar o token:", error);
@@ -340,7 +338,8 @@ async function verificarUsuario() {
 
 document.addEventListener("DOMContentLoaded", () => {
     renderEvents("Aprovado");
-
+    verificarUsuario()
+    getWallet();
     // Evento para submissão do formulário de aposta
     const betForm = document.getElementById("betForm");
     betForm.addEventListener("submit", handleBetSubmission);
@@ -366,4 +365,3 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-window.onload = verificarUsuario;

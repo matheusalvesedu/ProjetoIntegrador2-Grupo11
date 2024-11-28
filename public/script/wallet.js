@@ -5,7 +5,7 @@ if (localStorage.getItem('authToken') === null) {
 
     // Redireciona após um tempo para que o usuário veja a mensagem
     setTimeout(() => {
-        window.location.href = '../pages/signIN.html';
+        window.location.href = '../pages/signIn.html';
     }, 3000); 
 }
 
@@ -191,7 +191,6 @@ async function handleAddFunds(event) {
             if (response.ok) {
                 const data = await response.json();
                 alert(data.message);
-
             }
 
             else {

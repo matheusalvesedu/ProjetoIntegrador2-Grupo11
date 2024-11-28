@@ -98,7 +98,7 @@ export namespace FinancialManager {
     }
 
 
-    async function addFunds(ownerEmail: string, funds: number) {
+    async function addFunds(ownerEmail: string, funds: number, id: number) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         let connection = await OracleDB.getConnection({
@@ -113,6 +113,20 @@ export namespace FinancialManager {
         );
 
         if (result.rows && result.rows.length > 0) {
+
+            await connection.execute(
+                `UPDATE accounts
+                SET user_type = CASE
+                    WHEN user_type = 'NEWPLAYER' THEN 'PLAYER'
+                    ELSE user_type
+                END
+                WHERE id = :id`,
+                [id],
+                { autoCommit: true }
+            );
+
+            await connection.commit();
+
             await connection.execute(
                 `UPDATE accounts SET balance = balance + :Funds WHERE email = :ownerEmail`,
                 { funds, ownerEmail },
@@ -129,11 +143,12 @@ export namespace FinancialManager {
     export const addFundsHandler: RequestHandler = async (req: Request, res: Response) => {
         const pEmail = req.user?.email;
         const pFunds = req.get('funds');
+        const pId = req.user?.id;
         const transaction_type = req.get('transactionType');
 
-        if (pEmail && pFunds && transaction_type) {
+        if (pEmail && pFunds && transaction_type && pId) {
             const funds = parseFloat(pFunds);
-            if (funds > 0 && await addFunds(pEmail, funds)) {
+            if (funds > 0 && await addFunds(pEmail, funds, pId)) {
                 await createTransaction(pEmail, funds, transaction_type);
                 res.status(200).json({ message: 'Depósito concluído com sucesso!' });
             } else {
