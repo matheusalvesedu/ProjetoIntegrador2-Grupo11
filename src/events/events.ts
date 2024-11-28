@@ -205,7 +205,7 @@ export namespace EventsHandler {
         });
 
         let result = await connection.execute(
-            `SELECT * FROM EVENTS WHERE event_status = '${status_event}'`
+            `SELECT * FROM EVENTS WHERE event_status = '${status_event}' ORDER BY EVENT_ID DESC`
         );
 
         await connection.close();
